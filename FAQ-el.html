@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="el"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Συχνές Ερωτήσεις | Business Reform</title>
+
+<style>
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 110px;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2b2b2b;
+    line-height: 1.6;
+    background-color: white;
+}
+
+.hero {
+    text-align: center;
+        padding: clamp(50px, 10vw, 100px) 20px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.hero h1 {
+        font-size: clamp(28px, 6vw, 48px);
+    color: #1f3b5b;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: #6b7785;
+   font-size: clamp(16px, 3vw, 20px);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Watermark Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('logo_final.png') center center no-repeat;
+    background-size: 60%;
+    opacity: 0.10;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    background: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header img.main-logo {
+    height: 60px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #1f3b5b;
+    font-weight: 600;
+}
+
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+.lang-switch a {
+    display: block;
+    line-height: 1;
+    text-decoration: none;
+    opacity: 0.45;
+    filter: grayscale(40%);
+    transition: opacity 0.2s, filter 0.2s, transform 0.2s;
+}
+.lang-switch a svg {
+    display: block;
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(31,59,91,0.15);
+    overflow: hidden;
+}
+.lang-switch a:hover { opacity: 0.9; filter: grayscale(0%); transform: scale(1.1); }
+.lang-switch a.lang-active { opacity: 1; filter: grayscale(0%); }
+
+.li-logo {
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Mobile hamburger toggle (hidden on desktop) */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 22px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #1f3b5b;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Mobile-only: visually hide nav items until toggled */
+@media (max-width: 768px) {
+    .hero h1 { font-size: 34px; }
+
+    /* Show hamburger, collapse the nav into a dropdown */
+    .nav-toggle { display: flex; }
+
+    .nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #ffffff;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+
+    .nav.open { display: flex; }
+
+    .nav a {
+        margin: 0;
+        width: 100%;
+        padding: 12px 24px;
+        box-sizing: border-box;
+    }
+
+    /* Make the desktop-only row wrapper transparent to layout on mobile,
+       so its links stack individually in the dropdown exactly as before. */
+    .nav-links {
+        display: contents;
+    }
+    .lang-switch {
+        margin-top: 0;
+    }
+
+    /* Animate hamburger into an X when open */
+    .nav-toggle.open span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+}
+
+/* FAQ accordion */
+.faq-section {
+    padding: 10px 40px 90px;
+    max-width: 820px;
+    margin: auto;
+}
+
+.faq-item {
+    border: 1px solid #d0dce8;
+    border-radius: 10px;
+    background: #fff;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: box-shadow 0.25s, border-color 0.25s;
+}
+
+.faq-item.open {
+    border-color: #1f3b5b;
+    box-shadow: 0 6px 20px rgba(31,59,91,0.10);
+}
+
+.faq-question {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 20px 58px 20px 22px;
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1f3b5b;
+    line-height: 1.4;
+    position: relative;
+}
+
+.faq-question:hover { background: #f5f8fc; }
+.faq-question:focus-visible { outline: 2px solid #2c5380; outline-offset: -2px; }
+
+.faq-question::after {
+    content: "";
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #1f3b5b;
+    border-bottom: 2px solid #1f3b5b;
+    transform: translateY(-70%) rotate(45deg);
+    transition: transform 0.25s ease;
+}
+
+.faq-item.open .faq-question::after {
+    transform: translateY(-30%) rotate(225deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.faq-answer-inner {
+    padding: 0 22px 20px;
+    color: #444;
+    font-size: 15.5px;
+}
+
+.faq-answer-inner p { margin: 0; }
+.faq-answer-inner a { color: #2c5380; font-weight: 600; }
+
+@media (max-width: 768px) {
+    .faq-section { padding: 10px 20px 60px; }
+    .faq-question { font-size: 16px; padding-right: 48px; }
+}
+
+/* Footer */
+.footer {
+    background: #1f3b5b;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+   <a href="index-el.html#home"><img src="logo_final.png" alt="Business Reform Logo" class="main-logo"></a>
+
+    <!-- Mobile hamburger toggle (visible only on small screens via CSS) -->
+    <button class="nav-toggle" aria-label="Εναλλαγή μενού πλοήγησης" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="nav" id="primary-nav">
+        <div class="nav-links">
+            <a href="index-el.html#home">Αρχική</a>
+            <a href="index-el.html#services">Υπηρεσίες</a>
+            <a href="index-el.html#ai-solutions">Λύσεις AI CFO</a>
+            <a href="pricing-el.html">Τιμολόγηση</a>
+            <a href="portal-el.html">Πύλη Πελατών</a>
+            <a href="index-el.html#about">Σχετικά</a>
+            <a href="FAQ-el.html">Συχνές Ερωτήσεις</a>
+            <a href="index-el.html#contact">Επικοινωνία</a>
+        </div>
+        <span class="lang-switch">
+            <a href="FAQ-el.html" class="lang-flag lang-active" aria-label="Ελληνικά" title="Ελληνικά">
+                <svg viewBox="0 0 27 18" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <rect width="27" height="18" fill="#0D5EAF"/>
+                    <path d="M0,2H27M0,6H27M0,10H27M0,14H27" stroke="#fff" stroke-width="2"/>
+                    <rect width="10" height="10" fill="#0D5EAF"/>
+                    <path d="M5,0V10M0,5H10" stroke="#fff" stroke-width="2"/>
+                </svg>
+            </a>
+            <a href="FAQ.html" class="lang-flag" aria-label="English" title="English">
+                <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <defs><clipPath id="uk-clip-faq-el"><rect width="60" height="40"/></clipPath></defs>
+                    <g clip-path="url(#uk-clip-faq-el)">
+                        <rect width="60" height="40" fill="#012169"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="14"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="8"/>
+                    </g>
+                </svg>
+            </a>
+        </span>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Συχνές Ερωτήσεις</h1>
+    <p>Γρήγορες απαντήσεις σχετικά με τη Business Reform, την πλατφόρμα AI CFO, τις συνδρομές και την ασφάλεια των δεδομένων. Κάντε κλικ σε μια ερώτηση για να δείτε την απάντηση.</p>
+</div>
+
+<div class="faq-section">
+
+    <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Τι είναι η Business Reform;</button>
+        <div class="faq-answer">
+            <div class="faq-answer-inner">
+                <p>Η Business Reform είναι μια ομάδα συμβούλων με εκτενή εμπειρία στη χρηματοοικονομική και επιχειρηματική ανάλυση. Συνδυάζουμε πρακτική συμβουλευτική εργασία &mdash; κατάρτιση επιχειρηματικών σχεδίων, αποτιμήσεις έργων, ανάλυση χρηματοδοτικού κενού και συμβουλευτική επιλογών χρηματοδότησης &mdash; με εξατομικευμένες λύσεις Τεχνητής Νοημοσύνης που μετατρέπουν τα ακατέργαστα δεδομένα μιας επιχείρησης σε σαφή, έτοιμη προς λήψη αποφάσεων χρηματοοικονομική εικόνα. Η πλατφόρμα AI CFO επιτρέπει σε ιδρυτές και χρηματοοικονομικές ομάδες να δημιουργούν αναφορές επαγγελματικού επιπέδου, όπως νεκρού σημείου, ρυθμού ανάλωσης κεφαλαίων, προβλέψεων ταμειακών ροών, χρήσης κεφαλαίων, βελτιστοποίησης κεφαλαίου και πολυετών χρηματοοικονομικών προβολών, σε λεπτά αντί για εβδομάδες.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Γιατί να χρησιμοποιήσω τις αναφορές BR AI CFO;</button>
+        <div class="faq-answer">
+            <div class="faq-answer-inner">
+                <p>Επειδή τα στοιχεία πρέπει να είναι έτοιμα προτού τα ζητήσει κάποιος. Οι αναφορές BR AI CFO σάς παρέχουν χρηματοοικονομική τεκμηρίωση έτοιμη για επενδυτές και διοικητικά συμβούλια, την ανάλυση που απαιτούν τα πιστωτικά ιδρύματα για να αξιολογήσουν ένα αίτημα χρηματοδότησης, καθώς και την ορατότητα για να βελτιώσετε την κερδοφορία και τις ταμειακές ροές. Αντί να ξοδεύετε μέρες φτιάχνοντας υπολογιστικά φύλλα, λαμβάνετε συνεπείς, δομημένες αναφορές κατ&rsquo; απαίτηση &mdash; μειώνοντας τη σπατάλη χρόνου, περιορίζοντας την εξάρτηση από ένα πλήρες εσωτερικό οικονομικό τμήμα και εντοπίζοντας νωρίτερα κινδύνους και ευκαιρίες.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Ποιοι είναι οι άνθρωποι πίσω από την εταιρεία BR;</button>
+        <div class="faq-answer">
+            <div class="faq-answer-inner">
+                <p>Μια ισχυρή, αφοσιωμένη διεπιστημονική ομάδα με εκτενή εμπειρία σε θέματα επιχειρήσεων, χρηματοοικονομικών, ασφαλίσεων και νομικών, οι περισσότεροι εκ των οποίων έχουν εργαστεί για χρόνια σε πολυεθνικές εταιρείες και χρηματοπιστωτικά ιδρύματα. Αυτός ο συνδυασμός σημαίνει ότι κάθε αναφορά και σύσταση βασίζεται σε πραγματική εταιρική πρακτική &mdash; από την άντληση κεφαλαίων και τη διάρθρωση συμφωνιών έως τη συμμόρφωση, τη διαχείριση κινδύνου και την καθημερινή χρηματοοικονομική λειτουργία.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Ποια συνδρομή ταιριάζει καλύτερα στις ανάγκες μου;</button>
+        <div class="faq-answer">
+            <div class="faq-answer-inner">
+                <p>Εξαρτάται από τον τρόπο που εργάζεστε και από τις ημερήσιες ή μηνιαίες ανάγκες αναφορών της επιχείρησής σας. Αν είστε μεμονωμένος επαγγελματίας που χρειάζεται περιστασιακές αναφορές, ένα Μηνιαίο ή Ετήσιο Ατομικό πλάνο συνήθως αρκεί. Αν μια ομάδα χρειάζεται πολλούς χρήστες που κατεβάζουν εξατομικευμένες αναφορές σε Excel και PowerPoint, μαζί με τακτικές ώρες χρηματοοικονομικής συμβουλευτικής, ένα Επιχειρηματικό πλάνο είναι η καταλληλότερη επιλογή. Τα ετήσια πλάνα εξοικονομούν πάνω από 16% σε σχέση με τα μηνιαία. Αν ο όγκος αναφορών σας είναι υψηλός ή χρειάζεστε ειδικές παραδοχές ενσωματωμένες στα μοντέλα, επικοινωνήστε με την ομάδα συμβούλων μας και θα διαμορφώσουμε ένα πακέτο γύρω από την πραγματική σας χρήση. Δείτε τη σελίδα <a href="pricing-el.html">Τιμολόγησης</a> για πλήρη σύγκριση.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">Είναι ασφαλή τα δεδομένα που παρέχονται;</button>
+        <div class="faq-answer">
+            <div class="faq-answer-inner">
+                <p>Ναι. Ο χειρισμός, η αποθήκευση και η προστασία των δεδομένων σας διέπονται από τους Όρους και Προϋποθέσεις που αποδέχεστε κατά τη δημιουργία λογαριασμού. Τα έγγραφα που ανεβάζετε αποθηκεύονται ιδιωτικά και συνδέονται αποκλειστικά με τον λογαριασμό σας, η πρόσβαση περιορίζεται σε εξουσιοδοτημένους χρήστες και ασφαλή συστήματα υπό υποχρεώσεις εμπιστευτικότητας, και τα δεδομένα σας χρησιμοποιούνται μόνο για τη δημιουργία των αναφορών που ζητάτε &mdash; δεν κοινοποιούνται ποτέ σε τρίτους για άσχετους σκοπούς. Μπορείτε να διαγράψετε τα κοινόχρηστα έγγραφά σας από την πύλη πελατών ανά πάσα στιγμή.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>© 2026 Business Reform | Με την επιφύλαξη παντός δικαιώματος</p>
+    <a href="https://www.linkedin.com/company/business-reform" target="_blank">
+        <img src="./linkedinpng.png" alt="LinkedIn" class="li-logo"> Ακολουθήστε μας στο LinkedIn
+    </a>
+</div>
+
+<script>
+// Mobile-only nav toggle behaviour; script runs on all devices but affects visibility only via CSS media queries
+(function () {
+    var toggle = document.querySelector('.nav-toggle');
+    var nav = document.getElementById('primary-nav');
+
+    if (!toggle || !nav) return;
+
+    toggle.addEventListener('click', function () {
+        var isOpen = nav.classList.toggle('open');
+        toggle.classList.toggle('open', isOpen);
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Close the menu when a nav link is clicked (mobile behaviour)
+    nav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                toggle.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+})();
+
+// FAQ accordion: click a question to unfold its answer
+(function () {
+    var items = document.querySelectorAll('.faq-item');
+    if (!items.length) return;
+
+    function setOpen(item, open) {
+        var btn = item.querySelector('.faq-question');
+        var panel = item.querySelector('.faq-answer');
+        item.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        panel.style.maxHeight = open ? panel.scrollHeight + 'px' : null;
+    }
+
+    items.forEach(function (item) {
+        var btn = item.querySelector('.faq-question');
+        btn.addEventListener('click', function () {
+            setOpen(item, !item.classList.contains('open'));
+        });
+    });
+
+    // Keep open panels sized correctly after a viewport resize (text re-wraps)
+    window.addEventListener('resize', function () {
+        items.forEach(function (item) {
+            if (item.classList.contains('open')) {
+                item.querySelector('.faq-answer').style.maxHeight =
+                    item.querySelector('.faq-answer').scrollHeight + 'px';
+            }
+        });
+    });
+})();
+</script>
+
+</body></html>

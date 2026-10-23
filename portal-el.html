@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Πύλη Πελατών | Business Reform</title>
+<style>
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2b2b2b;
+    line-height: 1.6;
+    background-color: white;
+}
+
+/* Watermark Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('logo_final.png') center center no-repeat;
+    background-size: 60%;
+    opacity: 0.08;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    background: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.header img.main-logo { height: 60px; }
+.nav { display: flex; align-items: center; }
+.nav a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #1f3b5b;
+    font-weight: 600;
+}
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 20px;
+}
+.lang-switch a {
+    display: block;
+    line-height: 1;
+    text-decoration: none;
+    opacity: 0.45;
+    filter: grayscale(40%);
+    transition: opacity 0.2s, filter 0.2s, transform 0.2s;
+}
+.lang-switch a svg {
+    display: block;
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(31,59,91,0.15);
+    overflow: hidden;
+}
+.lang-switch a:hover { opacity: 0.9; filter: grayscale(0%); transform: scale(1.1); }
+.lang-switch a.lang-active { opacity: 1; filter: grayscale(0%); }
+
+/* Portal shell */
+.portal {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+.portal-intro { text-align: center; margin-bottom: 30px; }
+.portal-intro h1 { color: #1f3b5b; margin-bottom: 8px; font-size: 34px; }
+.portal-intro p { color: #555; margin: 0; }
+
+.panel {
+    border: 1px solid #e3e9f0;
+    border-top: 4px solid #1f3b5b;
+    border-radius: 12px;
+    background: #fff;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(31,59,91,0.08);
+}
+
+/* Auth tabs */
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+.tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #d0dce8;
+    background: #f7f9fb;
+    color: #1f3b5b;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.tab.active { background: #1f3b5b; color: #fff; border-color: #1f3b5b; }
+
+.field { display: flex; flex-direction: column; margin-bottom: 16px; }
+.field label { font-size: 13px; font-weight: 600; color: #1f3b5b; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+}
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f3b5b;
+    cursor: pointer;
+}
+.checkbox-label input {
+    flex: 0 0 auto;
+}
+.terms-label {
+    align-items: flex-start;
+    line-height: 1.4;
+}
+.terms-label label {
+    display: inline;
+    margin: 0;
+}
+.terms-link {
+    background: none;
+    border: none;
+    color: #2c5380;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: 0;
+    text-decoration: underline;
+}
+.terms-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(18, 34, 52, 0.64);
+}
+.terms-dialog {
+    width: min(680px, 100%);
+    max-height: min(760px, 90vh);
+    overflow: auto;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 18px 48px rgba(18, 34, 52, 0.28);
+}
+.terms-dialog header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e3e9f0;
+    background: #fff;
+}
+.terms-dialog h2 {
+    margin: 0;
+    color: #1f3b5b;
+    font-size: 22px;
+}
+.terms-close {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #d0dce8;
+    border-radius: 50%;
+    background: #f7f9fb;
+    color: #1f3b5b;
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+}
+.terms-content {
+    padding: 22px 24px 26px;
+}
+.terms-content h3 {
+    margin: 22px 0 8px;
+    color: #1f3b5b;
+    font-size: 17px;
+}
+.terms-content h3:first-child { margin-top: 0; }
+.terms-content h4 {
+    margin: 14px 0 4px;
+    color: #1f3b5b;
+    font-size: 14.5px;
+}
+.terms-content p,
+.terms-content ul {
+    margin: 0 0 12px;
+    color: #34465a;
+}
+.terms-content ul { padding-left: 22px; }
+.terms-content li { margin-bottom: 6px; }
+
+.btn {
+    background: #1f3b5b;
+    color: white;
+    padding: 13px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+    transition: 0.2s;
+}
+.btn:hover { background: #2c5380; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #2c5380;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.message {
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: none;
+}
+.message.show { display: block; }
+.message.error { background: #fdecea; color: #b3261e; border: 1px solid #f5c6c2; }
+.message.success { background: #e7f4ec; color: #1d6b3a; border: 1px solid #b9e0c7; }
+
+.hidden { display: none !important; }
+
+/* Logged-in Dashboard Area */
+.dashboard {
+    display: flex;
+    min-height: 600px;
+    border: 1px solid #e3e9f0;
+    border-top: 4px solid #1f3b5b;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(31,59,91,0.08);
+}
+
+.sidebar {
+    width: 260px;
+    background: #1f3b5b;
+    color: white;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar h3 {
+    margin: 0 0 24px 0;
+    font-size: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 12px;
+}
+.account-info {
+    font-size: 13px;
+    margin-bottom: 20px;
+    color: #b9c8d8;
+    word-break: break-all;
+}
+.account-info strong {
+    color: #fff;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: none;
+    background: #2c5380;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s;
+}
+.menu-btn:hover, .menu-btn.active {
+    background: #3b6798;
+}
+.menu-btn.logout {
+    background: #b3261e;
+    margin-top: auto;
+    margin-bottom: 0;
+    text-align: center;
+    width: 80px;
+        margin-left: 20px; /* pushes it right */
+
+}
+.menu-btn.logout:hover {
+    background: #961f18;
+}
+
+.content {
+    flex: 1;
+    padding: 32px;
+    background: white;
+}
+.content h2 {
+    color: #1f3b5b;
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+/* Upload features */
+.dropzone {
+    border: 2px dashed #b9c8d8;
+    border-radius: 10px;
+    padding: 36px 20px;
+    text-align: center;
+    color: #5a6b7d;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #fafcff;
+    margin-top: 12px;
+}
+.dropzone:hover, .dropzone.dragover {
+    border-color: #1f3b5b;
+    background: #f0f5fb;
+    color: #1f3b5b;
+}
+.dropzone .icon { font-size: 34px; display: block; margin-bottom: 8px; }
+.dropzone .pick { color: #1f3b5b; font-weight: 600; text-decoration: underline; }
+.dropzone small { display: block; margin-top: 6px; color: #8a98a8; }
+
+.selected-file {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #f4f7fb;
+    border: 1px solid #dce5ef;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.selected-file.show { display: flex; }
+
+.files { margin-top: 32px; }
+.files h3 { color: #1f3b5b; font-size: 17px; margin-bottom: 14px; }
+.file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #e9eef4;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.file-row .meta { min-width: 0; }
+.file-row .name {
+    font-weight: 600;
+    color: #1f3b5b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.file-row .sub { font-size: 12px; color: #8a98a8; }
+.file-row .actions { display: flex; gap: 8px; flex-shrink: 0; }
+.file-row .actions a, .file-row .actions button {
+    font-size: 13px;
+    text-decoration: none;
+    color: #2c5380;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+.file-row .actions button.del { color: #b3261e; }
+
+/* Shared Documents as a dropdown (used when more than two files exist) */
+.file-select-wrap { display: flex; flex-direction: column; gap: 12px; }
+.file-select-wrap select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    width: 100%;
+}
+.file-select-wrap .actions { display: flex; gap: 14px; }
+.file-select-wrap .actions a,
+.file-select-wrap .actions button {
+    font-size: 13px;
+    text-decoration: none;
+    color: #2c5380;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+}
+.file-select-wrap .actions button.del { color: #b3261e; }
+.file-select-wrap .actions button:disabled { color: #8a98a8; cursor: default; }
+
+.empty { color: #8a98a8; font-size: 14px; padding: 8px 0; }
+.report-result {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border: 1px solid #b9e0c7;
+    border-radius: 8px;
+    background: #e7f4ec;
+    color: #1d6b3a;
+    font-size: 14px;
+}
+.report-result.show { display: block; }
+.report-result a { color: #1f3b5b; font-weight: 700; }
+.processing-dots span {
+    animation: blink-dot 1.2s infinite;
+    opacity: 0.2;
+}
+.processing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.processing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink-dot {
+    0%, 20% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Feature Specific Elements */
+.chat-window {
+    border: 1px solid #e3e9f0;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafcff;
+}
+.chat-messages {
+    height: 320px;
+    overflow-y: auto;
+    border: 1px solid #dce5ef;
+    background: #fff;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    color: #8a98a8;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+}
+.chat-msg {
+    margin-bottom: 10px;
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.chat-msg.user {
+    align-self: flex-end;
+    background: #1f3b5b;
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+.chat-msg.assistant {
+    align-self: flex-start;
+    background: #eef2f7;
+    color: #2b2b2b;
+    border-bottom-left-radius: 2px;
+}
+.chat-msg.pending { opacity: 0.6; }
+.chat-window textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: none;
+    font-family: inherit;
+    margin-bottom: 10px;
+}
+.chat-window textarea:disabled { background: #f4f7fb; }
+
+.consultation-form textarea {
+    width: 100%;
+    height: 150px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 16px;
+}
+
+.footer {
+    background: #1f3b5b;
+    color: white;
+    text-align: center;
+    padding: 30px;
+    margin-top: 60px;
+}
+.footer a { color: #fff; text-decoration: none; }
+
+@media (max-width: 768px) {
+    .header { padding: 16px 20px; }
+    .dashboard { flex-direction: column; }
+    .sidebar { width: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <a href="index-el.html#home"><img src="logo_final.png" alt="Business Reform Logo" class="main-logo"></a>
+    <div class="nav">
+        <a href="index-el.html#home">Αρχική</a>
+        <a href="index-el.html#services">Υπηρεσίες</a>
+        <span class="lang-switch">
+            <a href="portal-el.html" class="lang-flag lang-active" aria-label="Ελληνικά" title="Ελληνικά">
+                <svg viewBox="0 0 27 18" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <rect width="27" height="18" fill="#0D5EAF"/>
+                    <path d="M0,2H27M0,6H27M0,10H27M0,14H27" stroke="#fff" stroke-width="2"/>
+                    <rect width="10" height="10" fill="#0D5EAF"/>
+                    <path d="M5,0V10M0,5H10" stroke="#fff" stroke-width="2"/>
+                </svg>
+            </a>
+            <a href="portal.html" class="lang-flag" aria-label="English" title="English">
+                <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <defs><clipPath id="uk-clip-portal-el"><rect width="60" height="40"/></clipPath></defs>
+                    <g clip-path="url(#uk-clip-portal-el)">
+                        <rect width="60" height="40" fill="#012169"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="14"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="8"/>
+                    </g>
+                </svg>
+            </a>
+        </span>
+        <button class="menu-btn logout hidden" id="logout-btn">Αποσύνδεση</button>
+    </div>
+</div>
+
+<div class="portal">
+    <div class="portal-intro">
+        <h1>Ο προσωπικός σας πίνακας ελέγχου</h1>
+        <p>Χρησιμοποιήστε τον προσωπικό σας βοηθό AI CFO.<br>
+            Αποκτήστε ασφαλή πρόσβαση στον χώρο εργασίας σας και μοιραστείτε έγγραφα με την ομάδα μας.</p>
+    </div>
+
+    <div class="panel" id="auth-panel">
+        <div class="tabs">
+            <div class="tab active" id="tab-login">Σύνδεση</div>
+            <div class="tab" id="tab-signup">Εγγραφή</div>
+        </div>
+
+        <div class="message" id="auth-message"></div>
+
+        <form id="login-form">
+            <div class="field">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" autocomplete="email" required>
+            </div>
+            <div class="field">
+                <label for="login-password">Κωδικός πρόσβασης</label>
+                <input type="password" id="login-password" autocomplete="current-password" required>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-login-password"> Εμφάνιση Κωδικού
+                </label>
+            </div>
+            <button type="submit" class="btn" id="login-btn">Σύνδεση</button>
+            <p style="text-align:center;margin:14px 0 0;">
+                <button type="button" class="link-btn" id="forgot-btn">Ξεχάσατε τον κωδικό σας;</button>
+            </p>
+        </form>
+
+        <form id="signup-form" class="hidden">
+            <div class="field">
+                <label for="signup-name">Ονοματεπώνυμο</label>
+                <input type="text" id="signup-name" autocomplete="name" required>
+            </div>
+            <div class="field">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" autocomplete="email" required>
+            </div>
+            <div class="field">
+                <label for="signup-password">Κωδικός πρόσβασης</label>
+                <input type="password" id="signup-password" autocomplete="new-password" minlength="8" required>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-signup-password"> Εμφάνιση Κωδικού
+                </label>
+                <div class="checkbox-label terms-label">
+                    <input type="checkbox" id="signup-terms" required>
+                    <span><label for="signup-terms">Έχω διαβάσει και αποδέχομαι τους</label> <button type="button" class="terms-link" id="terms-open">Όρους και Προϋποθέσεις Χρήσης</button></span>
+                </div>
+            </div>
+            <button type="submit" class="btn" id="signup-btn">Δημιουργία Λογαριασμού</button>
+        </form>
+    </div>
+
+    <div class="dashboard hidden" id="app-panel">
+        <div class="sidebar">
+            <h3>Χώρος Εργασίας Πελάτη</h3>
+            <div class="account-info">Συνδεδεμένος ως:<br><strong id="user-email"></strong></div>
+
+            <button class="menu-btn active" id="menu-home">Πίνακας Ελέγχου</button>
+            <button class="menu-btn" id="menu-reports">Δημιουργία Αναφορών</button>
+            <button class="menu-btn" id="menu-chat">Συνομιλήστε μαζί μας</button>
+            <button class="menu-btn" id="menu-consultation">Αίτημα Συμβουλευτικής</button>
+            <button class="menu-btn" id="menu-billing">Χρέωση & Συνδρομή</button>
+
+                    </div>
+
+        <div class="content">
+            <div class="message" id="app-message"></div>
+
+            <div id="page-home">
+                <h2>Καλώς ήρθατε στην Πύλη Business Reform</h2>
+                <p>Επιλέξτε μια επιλογή από το αριστερό μενού για να διαχειριστείτε τις επιλογές του λογαριασμού σας, να ζητήσετε αναφορές ή να επικοινωνήσετε με τους χρηματοοικονομικούς μας συμβούλους.</p>
+            </div>
+
+            <div id="page-reports" class="hidden">
+                <h2>Δημιουργία Αναφορών</h2>
+                <p>Επιλέξτε το άρθρωμα χρηματοοικονομικής ανάλυσης που θέλετε να εκτελέσετε στα αρχεία της επιχείρησής σας:</p>
+
+                <div class="field">
+                    <label for="report-type">Επιλογή Τύπου Αναφοράς</label>
+                    <select id="report-type">
+                        <option value="break-even">Αναφορά Ανάλυσης Νεκρού Σημείου</option>
+                        <option value="financial-projections">5ετής Αναφορά Χρηματοοικονομικών Προβλέψεων με Δείκτες Απόδοσης</option>
+                        <option value="burn-rate">Αναφορά Ρυθμού Κατανάλωσης Κεφαλαίου</option>
+                        <option value="cash-flow-forecast">Αναφορά Κυλιόμενης Πρόβλεψης Ταμειακών Ροών 13 Εβδομάδων / 12 Μηνών</option>
+                        <option value="capital-optimization">Αναφορά Βελτιστοποίησης & Αναδιάρθρωσης Κεφαλαίου</option>
+                        <option value="use-of-funds">Αναφορά Χρήσης Κεφαλαίων</option>
+                    </select>
+                </div>
+
+                <h3 style="color:#1f3b5b; margin: 24px 0 8px; font-size:15px;">Ανεβάστε υποστηρικτικά έγγραφα</h3>
+                <div class="dropzone" id="dropzone">
+                    <span class="icon">⬆️</span>
+                    <span><span class="pick">Επιλέξτε αρχείο</span> ή σύρετέ το εδώ</span>
+                    <small>Έως 25 MB ανά αρχείο</small>
+                </div>
+                <input type="file" id="file-input" class="hidden">
+
+                <div class="selected-file" id="selected-file">
+                    <span id="selected-name"></span>
+                    <span style="display:flex; gap:8px; flex-shrink:0;">
+                        <button class="btn" id="upload-btn" style="width:auto; padding:8px 18px;">Μεταφόρτωση</button>
+                        <button type="button" class="link-btn" id="remove-pending-btn" style="color:#b3261e;">Αφαίρεση</button>
+                    </span>
+                </div>
+
+                <div class="files">
+                    <h3>Τα Κοινόχρηστα Έγγραφά σας</h3>
+                    <div id="file-list"><div class="empty">Φόρτωση…</div></div>
+                </div>
+                <button type="button" class="btn" id="generate-report-btn" style="width: auto; padding: 12px 30px;">Δημιουργία αναφοράς! </button>
+                <div class="report-result" id="report-result"></div>
+            </div>
+
+            <div id="page-chat" class="hidden">
+                <h2>Συνομιλήστε μαζί μας</h2>
+                <p>Έχετε μια άμεση ερώτηση σχετικά με τις τρέχουσες βελτιστοποιήσεις του λογαριασμού σας; Στείλτε μήνυμα στον βοηθό AI CFO παρακάτω.</p>
+
+                <div class="chat-window">
+                    <div class="chat-messages" id="chat-messages">Φόρτωση ιστορικού συνομιλίας…</div>
+                    <textarea id="chat-input" placeholder="Πληκτρολογήστε το μήνυμά σας εδώ... (Enter για αποστολή, Shift+Enter για νέα γραμμή)"></textarea>
+                    <button type="button" class="btn" id="chat-send-btn" style="width: auto; padding: 10px 24px;">Αποστολή Μηνύματος</button>
+                </div>
+            </div>
+
+            <div id="page-consultation" class="hidden">
+                <h2>Αίτημα Συμβουλευτικής</h2>
+                <p>Υποβάλετε εξατομικευμένες απαιτήσεις απευθείας στους αναλυτές αξιολόγησης της εταιρείας.</p>
+
+                <div style="margin-bottom: 24px;">
+                    <p style="font-size: 20px; font-weight: 700; color: #1f3b5b; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 2px solid #e3e9f0;">Business Reform</p>
+                </div>
+
+                <form id="consultation-form" class="consultation-form">
+                    <input type="hidden" name="access_key" value="827b5e3f-5f25-496a-ae39-0eded16449c6">
+                    <input type="hidden" name="subject" value="Νέο Αίτημα Συμβουλευτικής – Πύλη Πελατών">
+
+                    <div class="field">
+                        <label for="consultation-name">Ονοματεπώνυμο</label>
+                        <input type="text" id="consultation-name" name="name" placeholder="Το ονοματεπώνυμό σας" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="consultation-email">Διεύθυνση Email</label>
+                        <input type="email" id="consultation-email" name="email" placeholder="Η διεύθυνση email σας" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="consultation-company">Επωνυμία Εταιρείας</label>
+                        <input type="text" id="consultation-company" name="company" placeholder="Η επωνυμία της εταιρείας σας">
+                    </div>
+
+                    <div class="field">
+                        <label for="consultation-text">Περιγράψτε τις Απαιτήσεις του Αιτήματος</label>
+                        <textarea id="consultation-text" name="message" placeholder="Περιγράψτε εδώ τη χρηματοοικονομική ή/και επιχειρηματική αναφορά ανάλυσης που χρειάζεστε και τον σκοπό για τον οποίο τη χρειάζεστε" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" id="consultation-submit-btn" style="width: auto; padding: 12px 30px;">Υποβολή Αιτήματος </button>
+                </form>
+            </div>
+
+            <div id="page-billing" class="hidden">
+                <h2>Χρέωση & Συνδρομή</h2>
+                <p>Προσαρμόστε τα προγράμματα ευθυγράμμισης της εταιρείας σας ή αλλάξτε τις μεθόδους λειτουργικών συναλλαγών.</p>
+
+                <div class="field">
+                    <label for="billing-duration">Πλάνο Συνδρομής</label>
+                    <select id="billing-duration">
+                        <option value="monthly-individual">Μηνιαίο Ατομικό</option>
+                        <option value="annual-individual">Ετήσιο Ατομικό</option>
+                        <option value="monthly-business">Μηνιαίο Επιχειρηματικό</option>
+                        <option value="annual-business">Ετήσιο Επιχειρηματικό</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="payment-method">Σύστημα Επεξεργασίας Πληρωμών</label>
+                    <select id="payment-method">
+                        <option value="credit-card">Πιστωτική Κάρτα</option>
+                        <option value="credit-card-stripe">Πιστωτική Κάρτα - Stripe</option>
+                        <option value="google-pay">Google Pay</option>
+                        <option value="apple-pay">Apple Pay</option>
+                        <option value="wire-transfer">Τραπεζικό Έμβασμα</option>
+                    </select>
+                </div>
+                <button type="button" class="btn" style="width: auto; padding: 12px 24px; margin-top:10px;">Ενημέρωση Παραμέτρων Χρέωσης</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="terms-modal hidden" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <div class="terms-dialog">
+        <header>
+            <h2 id="terms-title">Όροι και Προϋποθέσεις Χρήσης</h2>
+            <button type="button" class="terms-close" id="terms-close" aria-label="Κλείσιμο όρων και προϋποθέσεων">&times;</button>
+        </header>
+        <div class="terms-content">
+            <p><strong>BUSINESS-REFORM.COM — ΠΟΛΙΤΙΚΗ ΟΡΩΝ ΧΡΗΣΗΣ &amp; ΑΠΟΠΟΙΗΣΕΙΣ ΕΥΘΥΝΗΣ</strong></p>
+
+            <h3>ΜΕΡΟΣ 1: Ορισμοί &amp; Όροι και Προϋποθέσεις</h3>
+
+            <h4>1.1 Ορισμοί</h4>
+            <ul>
+                <li>«Εταιρεία» αναφέρεται στην Business Reform, επιχειρηματική οντότητα με έδρα την Αθήνα, Ελλάδα, η οποία λειτουργεί την πλατφόρμα business-reform.com.</li>
+                <li>«Υπηρεσία» αναφέρεται στην πλατφόρμα AI CFO, συμπεριλαμβανομένων εργαλείων εισαγωγής δεδομένων, χρηματοοικονομικού μετασχηματισμού, πινάκων KPI, προβλεπτικής ανάλυσης και συμβουλευτικών υπηρεσιών που παρέχονται μέσω της πλατφόρμας ή συναφών καναλιών.</li>
+                <li>«Χρήστης» αναφέρεται σε κάθε φυσικό πρόσωπο, εταιρεία ή νομική οντότητα που αποκτά πρόσβαση, εγγράφεται, ανεβάζει δεδομένα ή χρησιμοποιεί τις Υπηρεσίες.</li>
+                <li>«Πλατφόρμα» αναφέρεται στην ψηφιακή υποδομή που φιλοξενείται στο business-reform.com και στα συναφή συστήματα, APIs ή ενσωματώσεις τρίτων που χρησιμοποιούνται για την παροχή των Υπηρεσιών.</li>
+                <li>«Αναφορά» αναφέρεται σε κάθε έξοδο που παράγεται από Τεχνητή Νοημοσύνη ή από το σύστημα, συμπεριλαμβανομένων ενδεικτικά Χρηματοοικονομικών Προβλέψεων, ανάλυσης Ρυθμού Κατανάλωσης Κεφαλαίου, ανάλυσης Νεκρού Σημείου, πινάκων KPI, προβλέψεων ταμειακών ροών, μοντελοποίησης σεναρίων και στρατηγικών χρηματοοικονομικών αναλύσεων.</li>
+                <li>«Δεδομένα Χρήστη» αναφέρεται σε όλα τα αρχεία, χρηματοοικονομικά στοιχεία, έγγραφα, εξαγωγές ERP, υπολογιστικά φύλλα και κάθε άλλη πληροφορία που ανεβάζει ή διαβιβάζει ο Χρήστης.</li>
+                <li>«Έξοδοι AI» αναφέρεται σε όλες τις αναλύσεις, προβλέψεις, συνόψεις και δομημένες εξόδους που παράγονται από μηχανή βάσει των Δεδομένων Χρήστη.</li>
+            </ul>
+
+            <h4>1.2 Όροι Χρήσης</h4>
+            <p>Με την πρόσβαση ή τη χρήση της Υπηρεσίας, ο Χρήστης αποδέχεται να δεσμεύεται νομικά από τους παρόντες Όρους. Η Business Reform παρέχει εργαλεία χρηματοοικονομικής ευφυΐας με Τεχνητή Νοημοσύνη, σχεδιασμένα να μετατρέπουν ακατέργαστα χρηματοοικονομικά και λειτουργικά δεδομένα σε δομημένες αναλύσεις επιπέδου διοίκησης.</p>
+            <p>Για τη χρήση της Υπηρεσίας, οι Χρήστες πρέπει να ολοκληρώσουν τη ροή εργασίας της πλατφόρμας:</p>
+            <ul>
+                <li>Εγγραφή / Δημιουργία λογαριασμού</li>
+                <li>Επιλογή τύπου Αναφοράς</li>
+                <li>Μεταφόρτωση σχετικών χρηματοοικονομικών ή λειτουργικών δεδομένων</li>
+                <li>Επεξεργασία από Τεχνητή Νοημοσύνη και παραγωγή εξόδων</li>
+            </ul>
+            <p>Η Εταιρεία διατηρεί το δικαίωμα να τροποποιήσει, αναστείλει ή διακόψει οποιοδήποτε μέρος της Υπηρεσίας ανά πάσα στιγμή, προκειμένου να διασφαλίσει τη λειτουργική ακεραιότητα, την ασφάλεια ή τη συμμόρφωση.</p>
+
+            <h4>1.3 Ευθύνες Χρήστη για τις Μεταφορτώσεις</h4>
+            <p>Ο Χρήστης φέρει πλήρη ευθύνη για όλο το περιεχόμενο που ανεβάζει. Με τη μεταφόρτωση δεδομένων, ο Χρήστης δηλώνει και εγγυάται ότι:</p>
+            <ul>
+                <li><strong>Ακρίβεια &amp; Πληρότητα:</strong> Όλες οι υποβαλλόμενες πληροφορίες είναι ακριβείς, νόμιμες και πλήρεις, εξ όσων γνωρίζει ο Χρήστης.</li>
+                <li><strong>Νόμιμη Προέλευση Δεδομένων:</strong> Όλα τα χρηματοοικονομικά δεδομένα, οι πηγές εσόδων και τα υποκείμενα στοιχεία προέρχονται από νόμιμες επιχειρηματικές δραστηριότητες και συμμορφώνονται με την ισχύουσα νομοθεσία.</li>
+                <li><strong>Δικαιώματα &amp; Εξουσιοδότηση:</strong> Ο Χρήστης κατέχει ή διαθέτει νόμιμα δικαιώματα, άδειες ή εξουσιοδοτήσεις για τη μεταφόρτωση και επεξεργασία όλων των υποβαλλόμενων δεδομένων.</li>
+                <li><strong>Μη Παραβίαση:</strong> Το υλικό που ανεβάζεται δεν παραβιάζει δικαιώματα πνευματικής ιδιοκτησίας, υποχρεώσεις εμπιστευτικότητας, εμπορικά απόρρητα ή δικαιώματα τρίτων.</li>
+                <li><strong>Συμμόρφωση:</strong> Ο Χρήστης δεν θα χρησιμοποιήσει την Υπηρεσία για δόλιες αναφορές, παραπλανητική χρηματοοικονομική απεικόνιση, ξέπλυμα χρήματος, φοροδιαφυγή ή οποιαδήποτε παράνομη δραστηριότητα.</li>
+            </ul>
+            <p>Η Εταιρεία αποποιείται κάθε ευθύνη για τη νομιμότητα, την ακρίβεια ή την ακεραιότητα των Δεδομένων Χρήστη.</p>
+
+            <h3>ΜΕΡΟΣ 2: Πολιτική Απορρήτου</h3>
+            <p>Η Business Reform επεξεργάζεται δεδομένα σύμφωνα με τον Γενικό Κανονισμό Προστασίας Δεδομένων (GDPR – ΕΕ 2016/679) και την ισχύουσα ελληνική νομοθεσία περί προστασίας δεδομένων.</p>
+
+            <h4>2.1 Συλλογή Δεδομένων</h4>
+            <p>Συλλέγουμε και επεξεργαζόμαστε:</p>
+            <ul>
+                <li>Δεδομένα εγγραφής λογαριασμού (όνομα, email, στοιχεία οργανισμού)</li>
+                <li>Χρηματοοικονομικά και λειτουργικά σύνολα δεδομένων που ανεβάζουν οι Χρήστες</li>
+                <li>Δεδομένα χρήσης συστήματος (αρχεία καταγραφής, δείκτες απόδοσης, δεδομένα αλληλεπίδρασης)</li>
+                <li>Τεχνικά μεταδεδομένα απαραίτητα για τη λειτουργία της πλατφόρμας</li>
+            </ul>
+
+            <h4>2.2 Σκοπός Επεξεργασίας</h4>
+            <p>Τα δεδομένα υφίστανται επεξεργασία αποκλειστικά για:</p>
+            <ul>
+                <li>Παραγωγή αναφορών AI CFO και χρηματοοικονομικών αναλύσεων</li>
+                <li>Μετατροπή δεδομένων ERP/λογιστικής σε εκτελεστικά dashboards</li>
+                <li>Βελτίωση των μοντέλων AI, της ακρίβειας ανάλυσης και της απόδοσης της πλατφόρμας</li>
+                <li>Διασφάλιση της ασφάλειας της πλατφόρμας, πρόληψη απάτης και σταθερότητα συστήματος</li>
+                <li>Παροχή υποστήριξης πελατών και συμβουλευτικών υπηρεσιών</li>
+            </ul>
+            <p>Δεν πωλούμε προσωπικά ή χρηματοοικονομικά δεδομένα.</p>
+
+            <h4>2.3 Νομική Βάση Επεξεργασίας</h4>
+            <p>Η επεξεργασία βασίζεται σε:</p>
+            <ul>
+                <li>Συμβατική αναγκαιότητα (παροχή υπηρεσίας)</li>
+                <li>Έννομο συμφέρον (βελτίωση πλατφόρμας, ασφάλεια)</li>
+                <li>Νομικές υποχρεώσεις (όπου ισχύει)</li>
+                <li>Συγκατάθεση χρήστη (όπου απαιτείται ρητά)</li>
+            </ul>
+
+            <h4>2.4 Ασφάλεια Δεδομένων</h4>
+            <p>Η Εταιρεία εφαρμόζει κατάλληλα τεχνικά και οργανωτικά μέτρα, όπως:</p>
+            <ul>
+                <li>Κρυπτογράφηση δεδομένων κατά τη μεταφορά και την αποθήκευση</li>
+                <li>Μηχανισμοί ελέγχου πρόσβασης και ταυτοποίησης</li>
+                <li>Διαχωρισμένα περιβάλλοντα επεξεργασίας</li>
+                <li>Καταγραφή ελέγχου και παρακολούθηση</li>
+                <li>Αρχή ελάχιστου απαιτούμενου δικαιώματος πρόσβασης</li>
+            </ul>
+            <p>Παρότι εφαρμόζουμε ισχυρές διασφαλίσεις, κανένα σύστημα δεν μπορεί να εγγυηθεί απόλυτη ασφάλεια.</p>
+
+            <h4>2.5 Διατήρηση Δεδομένων</h4>
+            <p>Τα δεδομένα διατηρούνται μόνο για όσο διάστημα είναι απαραίτητο για:</p>
+            <ul>
+                <li>Την παροχή Υπηρεσιών</li>
+                <li>Τη συμμόρφωση με νομικές υποχρεώσεις</li>
+                <li>Την επίλυση διαφορών ή την επιβολή συμφωνιών</li>
+            </ul>
+            <p>Οι Χρήστες μπορούν να ζητήσουν διαγραφή, τηρουμένων των νόμιμων απαιτήσεων διατήρησης.</p>
+
+            <h3>ΜΕΡΟΣ 3: Πολιτική Cookies</h3>
+            <p>Η πλατφόρμα Business Reform χρησιμοποιεί cookies και παρόμοιες τεχνολογίες.</p>
+
+            <h4>3.1 Τύποι Cookies</h4>
+            <ul>
+                <li><strong>Απαραίτητα Cookies:</strong> Απαιτούνται για την ταυτοποίηση, την ασφαλή σύνδεση και τη βασική λειτουργικότητα της πλατφόρμας.</li>
+                <li><strong>Λειτουργικά Cookies:</strong> Βελτιώνουν την εμπειρία χρήστη και τη συνέχεια της ροής εργασίας.</li>
+                <li><strong>Cookies Απόδοσης &amp; Ανάλυσης:</strong> Βοηθούν στη μέτρηση της απόδοσης του συστήματος, της αποδοτικότητας επεξεργασίας AI και της βελτιστοποίησης της πλατφόρμας.</li>
+                <li><strong>Cookies Ασφαλείας:</strong> Εντοπίζουν ανωμαλίες, αποτρέπουν την κατάχρηση και προστατεύουν τους λογαριασμούς χρηστών.</li>
+            </ul>
+
+            <h4>3.2 Έλεγχος από τον Χρήστη</h4>
+            <p>Οι Χρήστες μπορούν να διαχειριστούν ή να απενεργοποιήσουν τα cookies μέσω των ρυθμίσεων του προγράμματος περιήγησης. Ωστόσο, η απενεργοποίηση των απαραίτητων cookies ενδέχεται να περιορίσει ή να εμποδίσει την πρόσβαση στη βασική λειτουργικότητα του AI CFO.</p>
+
+            <h3>ΜΕΡΟΣ 4: Αποποιήσεις Ευθύνης</h3>
+
+            <h4>4.1 Αποποίηση Ευθύνης για την Τεχνητή Νοημοσύνη</h4>
+            <p>Η Υπηρεσία χρησιμοποιεί τεχνητή νοημοσύνη και στατιστικά μοντέλα για την παραγωγή χρηματοοικονομικών αναλύσεων. Όλες οι έξοδοι που παράγονται από AI:</p>
+            <ul>
+                <li>Έχουν πιθανολογικό και ερμηνευτικό χαρακτήρα</li>
+                <li>Δεν συνιστούν χρηματοοικονομική, νομική, φορολογική ή επενδυτική συμβουλή</li>
+                <li>Δεν θα πρέπει να αποτελούν τη μοναδική βάση για τη λήψη χρηματοοικονομικών αποφάσεων</li>
+            </ul>
+            <p>Συνιστάται στους Χρήστες να συμβουλεύονται εξειδικευμένους επαγγελματίες πριν λάβουν κρίσιμες επιχειρηματικές αποφάσεις.</p>
+
+            <h4>4.2 Αποποίηση Ευθύνης για τις Αναφορές</h4>
+            <p>Οι Αναφορές παράγονται αποκλειστικά βάσει δεδομένων και παραδοχών που παρέχει ο Χρήστης. Η Εταιρεία:</p>
+            <ul>
+                <li>Δεν εγγυάται την ακρίβεια των υποκείμενων Δεδομένων Χρήστη</li>
+                <li>Δεν εγγυάται τη μελλοντική επιχειρηματική απόδοση ή τα αποτελέσματα</li>
+                <li>Δεν φέρει ευθύνη για χρηματοοικονομικές αποφάσεις που βασίζονται σε προβλέψεις ή εκτιμήσεις</li>
+                <li>Δεν αναλαμβάνει ευθύνη για ζημίες που προκύπτουν από τη χρήση των Αναφορών</li>
+            </ul>
+            <p>Οι προβλέψεις, τα σενάρια και οι εκτιμήσεις είναι εγγενώς αβέβαιες.</p>
+
+            <h4>4.3 Συναίνεση Μεταφόρτωσης</h4>
+            <p>Κάνοντας κλικ στο «Μεταφόρτωση» ή υποβάλλοντας δεδομένα, ο Χρήστης ρητά:</p>
+            <ul>
+                <li>Εξουσιοδοτεί την επεξεργασία των υποβαλλόμενων δεδομένων μέσω συστημάτων AI</li>
+                <li>Αποδέχεται αυτοματοποιημένες και ημι-αυτοματοποιημένες μεθόδους επεξεργασίας</li>
+                <li>Συναινεί στη μετατροπή των δεδομένων σε δομημένες χρηματοοικονομικές εξόδους</li>
+            </ul>
+
+            <h4>4.4 Περιορισμός Ευθύνης</h4>
+            <p>Στον μέγιστο βαθμό που επιτρέπεται από τον νόμο:</p>
+            <ul>
+                <li>Η Εταιρεία δεν φέρει ευθύνη για έμμεσες, παρεπόμενες, επακόλουθες ή τιμωρητικές ζημίες</li>
+                <li>Η ευθύνη για αποφάσεις που βασίζονται σε δεδομένα βαρύνει αποκλειστικά τον Χρήστη</li>
+                <li>Η συνολική ευθύνη δεν θα υπερβαίνει το ποσό που καταβλήθηκε (εάν υπάρχει) για την Υπηρεσία εντός των προηγούμενων 12 μηνών</li>
+            </ul>
+
+            <h3>ΜΕΡΟΣ 5: Συμφωνία Επεξεργασίας Δεδομένων (DPA)</h3>
+            <p>Η παρούσα Συμφωνία Επεξεργασίας Δεδομένων διέπει την επεξεργασία στο πλαίσιο του GDPR.</p>
+
+            <h4>5.1 Ρόλοι</h4>
+            <ul>
+                <li>Χρήστης: Υπεύθυνος Επεξεργασίας</li>
+                <li>Business Reform: Εκτελών την Επεξεργασία</li>
+            </ul>
+
+            <h4>5.2 Πεδίο Επεξεργασίας</h4>
+            <p>Ο Εκτελών την Επεξεργασία θα επεξεργάζεται προσωπικά και χρηματοοικονομικά δεδομένα αποκλειστικά για:</p>
+            <ul>
+                <li>Ανάλυση AI CFO</li>
+                <li>Χρηματοοικονομική μοντελοποίηση και αναφορά</li>
+                <li>Δημιουργία dashboard</li>
+                <li>Βελτιστοποίηση συστήματος και παροχή υπηρεσίας</li>
+            </ul>
+            <p>Καμία επεξεργασία δεν πραγματοποιείται εκτός του τεκμηριωμένου πεδίου χωρίς ρητή εντολή.</p>
+
+            <h4>5.3 Εμπιστευτικότητα</h4>
+            <p>Όλα τα Δεδομένα Χρήστη αντιμετωπίζονται ως αυστηρά εμπιστευτικά. Η πρόσβαση περιορίζεται σε εξουσιοδοτημένο προσωπικό και ασφαλή συστήματα, υπό υποχρεώσεις εμπιστευτικότητας.</p>
+
+            <h4>5.4 Υπο-εκτελούντες την Επεξεργασία</h4>
+            <p>Η Εταιρεία δύναται να συνεργάζεται με τρίτους παρόχους υποδομής ή παρόχους μοντέλων AI για την παροχή των Υπηρεσιών. Όλοι οι υπο-εκτελούντες την επεξεργασία οφείλουν να:</p>
+            <ul>
+                <li>Διατηρούν διασφαλίσεις συμβατές με τον GDPR</li>
+                <li>Εφαρμόζουν μέτρα ασφαλείας σύμφωνα με τα πρότυπα του κλάδου</li>
+                <li>Επεξεργάζονται δεδομένα μόνο βάσει συμβατικών εντολών</li>
+            </ul>
+
+            <h4>5.5 Δικαιώματα Υποκειμένου Δεδομένων</h4>
+            <p>Η Business Reform υποστηρίζει τους Χρήστες στην εκπλήρωση των υποχρεώσεων GDPR, συμπεριλαμβανομένων:</p>
+            <ul>
+                <li>Δικαίωμα πρόσβασης</li>
+                <li>Δικαίωμα διόρθωσης</li>
+                <li>Δικαίωμα διαγραφής</li>
+                <li>Δικαίωμα περιορισμού</li>
+                <li>Δικαίωμα φορητότητας δεδομένων</li>
+                <li>Δικαίωμα εναντίωσης</li>
+            </ul>
+            <p>Τα αιτήματα θα διεκπεραιώνονται εντός των νόμιμα απαιτούμενων προθεσμιών.</p>
+
+            <h4>5.6 Ειδοποίηση Παραβίασης Δεδομένων</h4>
+            <p>Σε περίπτωση παραβίασης προσωπικών δεδομένων, η Εταιρεία θα:</p>
+            <ul>
+                <li>Ενημερώνει τις αρμόδιες αρχές όπου απαιτείται από τον νόμο</li>
+                <li>Ενημερώνει τους θιγόμενους Χρήστες χωρίς αδικαιολόγητη καθυστέρηση</li>
+                <li>Λαμβάνει διορθωτικά μέτρα για τον περιορισμό των κινδύνων</li>
+            </ul>
+
+            <h3>ΜΕΡΟΣ 6: Συμμόρφωση με τον Κανονισμό της ΕΕ για την Τεχνητή Νοημοσύνη (AI Act)</h3>
+            <p>Η Business Reform σχεδιάζει και λειτουργεί την Υπηρεσία σύμφωνα με τον Κανονισμό (ΕΕ) 2024/1689 για τη θέσπιση εναρμονισμένων κανόνων σχετικά με την τεχνητή νοημοσύνη (ο «Κανονισμός για την ΤΝ» ή «AI Act»), καθώς οι υποχρεώσεις του τίθενται σε εφαρμογή, παράλληλα με τον GDPR και τους λοιπούς νόμους που αναφέρονται στους παρόντες Όρους.</p>
+
+            <h4>6.1 Ρόλος της Εταιρείας και Συστήματα ΤΝ που Χρησιμοποιούνται</h4>
+            <p>Το AI CFO είναι σύστημα ΤΝ που λειτουργεί η Business Reform υπό την επωνυμία της. Βασίζεται σε μοντέλα ΤΝ γενικού σκοπού τρίτων παρόχων (βλ. Ενότητα 5.4), οι οποίοι υπόκεινται στις δικές τους υποχρεώσεις ως πάροχοι μοντέλων ΤΝ γενικού σκοπού βάσει του Κεφαλαίου V του Κανονισμού για την ΤΝ. Η Business Reform ενεργεί ως πάροχος του συστήματος AI CFO όπως διατίθεται στους Χρήστες και ως φορέας εφαρμογής των υποκείμενων μοντέλων.</p>
+
+            <h4>6.2 Κατάταξη Κινδύνου και Σκοπός Χρήσης</h4>
+            <p>Σκοπός χρήσης του AI CFO είναι η μετατροπή χρηματοοικονομικών και λειτουργικών δεδομένων επιχειρήσεων σε χρηματοοικονομική ανάλυση, αναφορές, KPI dashboards και προβλέψεις για εταιρείες. Η Υπηρεσία:</p>
+            <ul>
+                <li>Δεν εφαρμόζει καμία απαγορευμένη πρακτική ΤΝ του άρθρου 5 του Κανονισμού για την ΤΝ</li>
+                <li>Δεν προορίζεται για καμία χρήση υψηλού κινδύνου του Παραρτήματος III, όπως η αξιολόγηση της πιστοληπτικής ικανότητας φυσικών προσώπων ή ο καθορισμός πιστωτικής βαθμολογίας, η εκτίμηση κινδύνου και η τιμολόγηση ασφάλισης ζωής ή υγείας, ή αποφάσεις για απασχόληση, πρόσληψη ή πρόσβαση σε βασικές υπηρεσίες</li>
+                <li>Αντιμετωπίζεται επομένως ως σύστημα ΤΝ που υπόκειται στις υποχρεώσεις διαφάνειας του άρθρου 50 του Κανονισμού για την ΤΝ</li>
+            </ul>
+            <p>Οι Χρήστες δεν επιτρέπεται να χρησιμοποιούν την Υπηρεσία ή τις Εξόδους AI για σκοπό υψηλού κινδύνου του Παραρτήματος III ή για σκοπό που απαγορεύεται από το άρθρο 5. Χρήστης που το πράττει ενεργεί εκτός του σκοπού χρήσης της Υπηρεσίας και αναλαμβάνει τις αντίστοιχες υποχρεώσεις βάσει του Κανονισμού για την ΤΝ.</p>
+
+            <h4>6.3 Διαφάνεια και Σήμανση Περιεχομένου που Παράγεται από ΤΝ</h4>
+            <p>Σύμφωνα με το άρθρο 50 του Κανονισμού για την ΤΝ:</p>
+            <ul>
+                <li>Οι Χρήστες ενημερώνονται, πριν και κατά τη χρήση, ότι αλληλεπιδρούν με σύστημα ΤΝ, και όταν χρησιμοποιούν τον βοηθό συνομιλίας (chat)</li>
+                <li>Κάθε Αναφορά που παράγει η Υπηρεσία φέρει ορατή σήμανση «AI generated» με παραπομπή στον Κανονισμό για την ΤΝ: κάτω αριστερά σε κάθε διαφάνεια στις παρουσιάσεις PowerPoint, και στο εξώφυλλο και κάτω αριστερά σε κάθε εκτυπωμένη σελίδα στα αρχεία Excel</li>
+                <li>Τα παραγόμενα αρχεία φέρουν επίσης μηχανικά αναγνώσιμη δήλωση στα μεταδεδομένα τους, που προσδιορίζει το περιεχόμενο ως παραγόμενο από ΤΝ</li>
+            </ul>
+            <p>Οι Χρήστες δεν επιτρέπεται να αφαιρούν, να αποκρύπτουν ή να τροποποιούν τη σήμανση όταν κοινοποιούν Αναφορές σε τρίτους. Όταν Χρήστης δημοσιεύει Εξόδους AI με σκοπό την ενημέρωση του κοινού για θέματα δημόσιου ενδιαφέροντος, ευθύνεται ο ίδιος για κάθε γνωστοποίηση που του επιβάλλει το άρθρο 50 παρ. 4, εκτός αν το περιεχόμενο έχει υποβληθεί σε ανθρώπινο έλεγχο ή συντακτικό έλεγχο και φυσικό ή νομικό πρόσωπο φέρει τη συντακτική ευθύνη για τη δημοσίευσή του.</p>
+
+            <h4>6.4 Ανθρώπινη Εποπτεία</h4>
+            <p>Η Υπηρεσία είναι εργαλείο υποστήριξης αποφάσεων. Οι Έξοδοι AI προορίζονται να ελέγχονται από τον Χρήστη και, όπου ενδείκνυται, από εξειδικευμένους επαγγελματίες πριν χρησιμοποιηθούν (βλ. Μέρος 4). Καμία απόφαση που παράγει έννομα αποτελέσματα ή επηρεάζει ανάλογα σημαντικά ένα φυσικό πρόσωπο δεν λαμβάνεται από την Υπηρεσία αποκλειστικά με αυτοματοποιημένη επεξεργασία. Οι Χρήστες μπορούν να ζητήσουν έλεγχο μιας Αναφοράς από μέλος της ομάδας της Business Reform.</p>
+
+            <h4>6.5 Ακρίβεια, Ιχνηλασιμότητα και Τήρηση Αρχείων</h4>
+            <p>Για την υποστήριξη της ακρίβειας και της λογοδοσίας, η Υπηρεσία:</p>
+            <ul>
+                <li>Υπολογίζει τα βασικά μεγέθη με ντετερμινιστικούς υπολογισμούς και τα παρουσιάζει ως ενεργούς τύπους Excel συνδεδεμένους με τα υποκείμενα δεδομένα, ώστε να μπορούν να ελεγχθούν</li>
+                <li>Καταγράφει σε ξεχωριστή ενότητα παραδοχών τις επιφυλάξεις για τα δεδομένα, τα στοιχεία που εξαιρέθηκαν, το σκεπτικό ταξινόμησης και τους περιορισμούς κάθε Αναφοράς</li>
+                <li>Τηρεί αρχεία για κάθε αίτημα Αναφοράς και τις εξόδους του, για το διάστημα που ορίζεται στην Ενότητα 2.5</li>
+            </ul>
+            <p>Τα μέτρα αυτά μειώνουν αλλά δεν εξαλείφουν τον κίνδυνο σφαλμάτων. Οι αποποιήσεις ευθύνης του Μέρους 4 εξακολουθούν να ισχύουν.</p>
+
+            <h4>6.6 Παιδεία στην ΤΝ (AI Literacy)</h4>
+            <p>Σύμφωνα με το άρθρο 4 του Κανονισμού για την ΤΝ, η Business Reform λαμβάνει μέτρα ώστε το προσωπικό της και όσοι λειτουργούν την Υπηρεσία για λογαριασμό της να διαθέτουν επαρκές επίπεδο παιδείας στην ΤΝ, λαμβάνοντας υπόψη τις τεχνικές γνώσεις, την εμπειρία τους και το πλαίσιο χρήσης της Υπηρεσίας.</p>
+
+            <h4>6.7 Αναφορά Προβλημάτων και Επικαιροποιήσεις</h4>
+            <p>Οι Χρήστες μπορούν να αναφέρουν λανθασμένες, παραπλανητικές ή άλλως προβληματικές Εξόδους AI, ή οποιαδήποτε ανησυχία για τη συμμόρφωση της Υπηρεσίας με τον Κανονισμό για την ΤΝ, μέσω των στοιχείων επικοινωνίας της Πλατφόρμας. Η Εταιρεία εξετάζει τις αναφορές αυτές και λαμβάνει διορθωτικά μέτρα όπου απαιτείται. Οι Χρήστες διατηρούν επίσης το δικαίωμα υποβολής καταγγελίας στην αρμόδια εθνική αρχή εποπτείας της αγοράς.</p>
+            <p>Η Εταιρεία θα επικαιροποιεί το παρόν Μέρος καθώς τίθενται σε εφαρμογή περαιτέρω διατάξεις του Κανονισμού για την ΤΝ και καθώς δημοσιεύονται κατευθυντήριες γραμμές, εκτελεστικές πράξεις και κώδικες πρακτικής από την Ευρωπαϊκή Επιτροπή και το Γραφείο ΤΝ (AI Office).</p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© 2026 Business Reform | Με την επιφύλαξη παντός δικαιώματος</p>
+</div>
+
+<script type="module">
+import {
+    login, signup, logout, getUser,
+    requestPasswordRecovery, handleAuthCallback,
+    AuthError, MissingIdentityError,
+} from 'https://esm.sh/@netlify/identity@1.2.0';
+
+// --- Element Refs ---
+const authPanel = document.getElementById('auth-panel');
+const appPanel = document.getElementById('app-panel');
+const authMessage = document.getElementById('auth-message');
+const appMessage = document.getElementById('app-message');
+const userEmail = document.getElementById('user-email');
+
+const tabLogin = document.getElementById('tab-login');
+const tabSignup = document.getElementById('tab-signup');
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
+const signupTerms = document.getElementById('signup-terms');
+const termsOpen = document.getElementById('terms-open');
+const termsClose = document.getElementById('terms-close');
+const termsModal = document.getElementById('terms-modal');
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+const selectedFile = document.getElementById('selected-file');
+const selectedName = document.getElementById('selected-name');
+const uploadBtn = document.getElementById('upload-btn');
+const removePendingBtn = document.getElementById('remove-pending-btn');
+const fileList = document.getElementById('file-list');
+const logoutBtn = document.getElementById('logout-btn');
+const reportType = document.getElementById('report-type');
+const generateReportBtn = document.getElementById('generate-report-btn');
+const reportResult = document.getElementById('report-result');
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+
+// --- Navigation Pages Hookups ---
+const menuHome = document.getElementById('menu-home');
+const menuReports = document.getElementById('menu-reports');
+const menuChat = document.getElementById('menu-chat');
+const menuConsultation = document.getElementById('menu-consultation');
+const menuBilling = document.getElementById('menu-billing');
+
+const pageHome = document.getElementById('page-home');
+const pageReports = document.getElementById('page-reports');
+const pageChat = document.getElementById('page-chat');
+const pageConsultation = document.getElementById('page-consultation');
+const pageBilling = document.getElementById('page-billing');
+
+const menuButtons = [menuHome, menuReports, menuChat, menuConsultation, menuBilling];
+const pages = [pageHome, pageReports, pageChat, pageConsultation, pageBilling];
+
+let pendingFile = null;
+let selectedReportFileKey = null;
+let selectedReportFileName = '';
+let reportPollTimer = null;
+let currentFiles = [];
+let chatHistoryLoaded = false;
+
+// Netlify Blobs list() is eventually consistent and can lag up to ~60s behind a
+// write, so a fresh upload/delete may not show up in the next /api/portal/files
+// response. These overlays keep the UI correct in the meantime and clear
+// themselves once the server list catches up.
+let serverFiles = [];
+const pendingAdds = new Map();     // key -> optimistic file, until list() includes it
+const pendingDeletes = new Set();  // key, until list() stops returning it
+let fileResyncTimers = [];
+
+// --- Helper Switch Functional Layout Views ---
+function switchView(activeMenu, activePage) {
+    menuButtons.forEach(btn => btn.classList.remove('active'));
+    pages.forEach(p => p.classList.add('hidden'));
+
+    activeMenu.classList.add('active');
+    activePage.classList.remove('hidden');
+    clearMessage(appMessage);
+}
+
+menuHome.addEventListener('click', () => switchView(menuHome, pageHome));
+menuReports.addEventListener('click', () => switchView(menuReports, pageReports));
+menuChat.addEventListener('click', () => {
+    switchView(menuChat, pageChat);
+    if (!chatHistoryLoaded) loadChatHistory();
+});
+menuConsultation.addEventListener('click', () => switchView(menuConsultation, pageConsultation));
+menuBilling.addEventListener('click', () => switchView(menuBilling, pageBilling));
+
+// --- Password Visibility Features ---
+document.getElementById('show-login-password').addEventListener('change', function() {
+    document.getElementById('login-password').type = this.checked ? 'text' : 'password';
+});
+
+document.getElementById('show-signup-password').addEventListener('change', function() {
+    document.getElementById('signup-password').type = this.checked ? 'text' : 'password';
+});
+
+function openTermsModal() {
+    termsModal.classList.remove('hidden');
+    termsClose.focus();
+}
+
+function closeTermsModal() {
+    termsModal.classList.add('hidden');
+    termsOpen.focus();
+}
+
+termsOpen.addEventListener('click', openTermsModal);
+termsClose.addEventListener('click', closeTermsModal);
+termsModal.addEventListener('click', (event) => {
+    if (event.target === termsModal) closeTermsModal();
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !termsModal.classList.contains('hidden')) {
+        closeTermsModal();
+    }
+});
+
+
+
+// --- Auth Messages Systems ---
+function showMessage(el, text, kind) {
+    el.textContent = text;
+    el.className = `message show ${kind}`;
+}
+function clearMessage(el) { el.className = 'message'; el.textContent = ''; }
+
+function formatSize(bytes) {
+    if (!bytes) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let i = 0, n = bytes;
+    while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+    return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+function describeError(error) {
+    // Always log full error for debugging (remove in production)
+    console.error('Auth error object:', error);
+
+    // Handle MissingIdentityError specifically
+    if (error instanceof MissingIdentityError) {
+        return 'Η πύλη πελατών δεν είναι ακόμη ενεργή. Δοκιμάστε ξανά σύντομα ή επικοινωνήστε μαζί μας.';
+    }
+
+    // If library exposes AuthError class, inspect it
+    if (error instanceof AuthError || error && typeof error === 'object') {
+        // Try to read common fields that may contain server text
+        const raw = error.error_description || error.error || error.message || (error.json && error.json.error_description) || '';
+
+        // Look for confirmation-specific messages (narrow match)
+        if (/confirm(ed|ation)?|user is not confirmed|email not verified|email not confirmed/i.test(raw)) {
+            return 'Η διεύθυνση email σας δεν έχει επιβεβαιωθεί ακόμη. Ελέγξτε τα εισερχόμενά σας και κάντε κλικ στον σύνδεσμο ενεργοποίησης.';
+        }
+
+        // invalid_grant can mean bad credentials — do not assume it's always email verification
+        if (/invalid_grant/i.test(raw)) {
+            return 'Μη έγκυρο email ή κωδικός πρόσβασης. Αν πιστεύετε ότι είναι λάθος, ελέγξτε τον κωδικό σας ή επαναφέρετέ τον.';
+        }
+
+        // Common HTTP statuses
+        switch (error.status) {
+            case 401: return raw || 'Μη έγκυρο email ή κωδικός πρόσβασης.';
+            case 403: return 'Οι εγγραφές είναι προσωρινά απενεργοποιημένες. Επικοινωνήστε μαζί μας για πρόσβαση.';
+            case 422: return 'Ελέγξτε τα στοιχεία σας — ο κωδικός πρόσβασης μπορεί να είναι πολύ αδύναμος.';
+            case 404: return 'Δεν βρέθηκε λογαριασμός για αυτό το email.';
+            default:
+                return raw || (typeof error === 'string' ? error : 'Κάτι πήγε στραβά. Δοκιμάστε ξανά.');
+        }
+    }
+
+    // Fallback
+    return 'Κάτι πήγε στραβά. Δοκιμάστε ξανά.';
+}
+
+// --- View State Switches ---
+function showLoggedIn(user, showConfirmationMessage = false) {
+    userEmail.textContent = user.email;
+    authPanel.classList.add('hidden');
+    appPanel.classList.remove('hidden');
+     logoutBtn.classList.remove('hidden'); // SHOW LOGOUT
+    switchView(menuHome, pageHome);
+    if (showConfirmationMessage) {
+        showMessage(appMessage, 'Το email επιβεβαιώθηκε με επιτυχία. Καλωσορίσατε!', 'success');
+    }
+    loadFiles();
+}
+function showLoggedOut() {
+    appPanel.classList.add('hidden');
+    authPanel.classList.remove('hidden');
+    logoutBtn.classList.add('hidden'); // HIDE LOGOUT
+    tabLogin.click();
+}
+
+// --- Auth Tab Toggling ---
+tabLogin.addEventListener('click', () => {
+    tabLogin.classList.add('active');
+    tabSignup.classList.remove('active');
+    loginForm.classList.remove('hidden');
+    signupForm.classList.add('hidden');
+    clearMessage(authMessage);
+});
+tabSignup.addEventListener('click', () => {
+    tabSignup.classList.add('active');
+    tabLogin.classList.remove('active');
+    signupForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    clearMessage(authMessage);
+});
+
+// --- Execution Login Form Handlers ---
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true; clearMessage(authMessage);
+    try {
+        const user = await login(
+            document.getElementById('login-email').value,
+            document.getElementById('login-password').value,
+        );
+        showLoggedIn(user);
+    } catch (error) {
+        console.error('Login error (debug):', error);
+        showMessage(authMessage, describeError(error), 'error');
+    } finally {
+        btn.disabled = false;
+    }
+});
+
+// --- Signup Form Handlers (client-side validation + clearer loading state) ---
+signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('signup-btn');
+
+    // Prevent double submission
+    if (btn.disabled) return;
+
+    clearMessage(authMessage);
+
+    // Client-side validation
+    const nameEl = document.getElementById('signup-name');
+    const emailEl = document.getElementById('signup-email');
+    const passEl = document.getElementById('signup-password');
+
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    const password = passEl.value || '';
+
+    if (!name) {
+        showMessage(authMessage, 'Παρακαλώ εισαγάγετε το ονοματεπώνυμό σας.', 'error');
+        nameEl.focus();
+        return;
+    }
+    if (!emailEl.checkValidity()) {
+        showMessage(authMessage, 'Παρακαλώ εισαγάγετε μια έγκυρη διεύθυνση email.', 'error');
+        emailEl.focus();
+        return;
+    }
+    if (password.length < 8) {
+        showMessage(authMessage, 'Ο κωδικός πρόσβασης πρέπει να έχει τουλάχιστον 8 χαρακτήρες.', 'error');
+        passEl.focus();
+        return;
+    }
+    if (!signupTerms.checked) {
+        showMessage(authMessage, 'Παρακαλώ διαβάστε και αποδεχτείτε τους Όρους και Προϋποθέσεις Χρήσης.', 'error');
+        signupTerms.focus();
+        return;
+    }
+
+    // Clear previous messages and show loading state
+    clearMessage(authMessage);
+    btn.disabled = true;
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'Δημιουργία…';
+    btn.setAttribute('aria-busy', 'true');
+
+    try {
+        const user = await signup(
+            email,
+            password,
+            { full_name: name },
+        );
+
+        // @netlify/identity returns a User whose `confirmedAt` is set only when
+        // the account is already confirmed (i.e. Autoconfirm is ON).
+        if (user && user.confirmedAt) {
+            // Autoconfirm is ON — the user is created and already logged in.
+            showLoggedIn(user);
+        } else {
+            // Autoconfirm is OFF — a confirmation email was sent and the user is
+            // NOT logged in yet. They must click the activation link first.
+            tabLogin.click();
+            showMessage(authMessage, 'Ο λογαριασμός δημιουργήθηκε! Ελέγξτε το email σας για τον σύνδεσμο επιβεβαίωσης για να ενεργοποιήσετε τον λογαριασμό σας και μετά συνδεθείτε εδώ.', 'success');
+        }
+    } catch (error) {
+        // Keep a debug log for troubleshooting
+        console.error('Signup error (debug):', error);
+        showMessage(authMessage, describeError(error), 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.originalText || 'Δημιουργία Λογαριασμού';
+        btn.removeAttribute('aria-busy');
+    }
+});
+
+// --- Forgot Passwords Operations ---
+document.getElementById('forgot-btn').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    if (!email) {
+        showMessage(authMessage, 'Εισαγάγετε πρώτα το email σας παραπάνω και μετά κάντε ξανά κλικ.', 'error');
+        return;
+    }
+    try {
+        await requestPasswordRecovery(email);
+        showMessage(authMessage, 'Ελέγξτε το email σας για τον σύνδεσμο επαναφοράς κωδικού.', 'success');
+    } catch (error) {
+        showMessage(authMessage, describeError(error), 'error');
+    }
+});
+
+// --- Logout Events ---
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    await logout();
+    showLoggedOut();
+});
+
+// --- File Selection Architecture ---
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) setPendingFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) setPendingFile(fileInput.files[0]);
+});
+
+function setPendingFile(file) {
+    pendingFile = file;
+    selectedName.textContent = `${file.name} (${formatSize(file.size)})`;
+    selectedFile.classList.add('show');
+    clearMessage(appMessage);
+    reportResult.classList.remove('show');
+    reportResult.textContent = '';
+}
+
+function clearPendingFile() {
+    pendingFile = null;
+    fileInput.value = '';
+    selectedFile.classList.remove('show');
+    selectedName.textContent = '';
+}
+
+removePendingBtn.addEventListener('click', clearPendingFile);
+
+// --- Upload Pipeline ---
+uploadBtn.addEventListener('click', async () => {
+    if (!pendingFile) return;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Μεταφόρτωση…';
+    clearMessage(appMessage);
+    try {
+        const body = new FormData();
+        body.append('file', pendingFile);
+        const res = await fetch('/api/portal/upload', { method: 'POST', body, credentials: 'include' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Η μεταφόρτωση απέτυχε.');
+        const uploadedFile = data.file || {
+            key: data.key,
+            name: data.name || pendingFile.name,
+            size: data.size || pendingFile.size,
+            uploadedAt: new Date().toISOString(),
+        };
+        selectedReportFileKey = uploadedFile.key;
+        selectedReportFileName = uploadedFile.name;
+        showMessage(appMessage, `Το "${pendingFile.name}" μεταφορτώθηκε με επιτυχία.`, 'success');
+        pendingFile = null;
+        fileInput.value = '';
+        selectedFile.classList.remove('show');
+        pendingAdds.set(uploadedFile.key, uploadedFile);
+        pendingDeletes.delete(uploadedFile.key);
+        renderFiles(reconcileFiles());
+        loadFiles();
+        scheduleFileResync();
+    } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Μεταφόρτωση';
+    }
+});
+
+// --- File Storage Listing Loading ---
+async function loadFiles() {
+    const optimistic = pendingAdds.size || pendingDeletes.size;
+    if (!optimistic && !serverFiles.length) fileList.innerHTML = '<div class="empty">Φόρτωση…</div>';
+    try {
+        const res = await fetch('/api/portal/files', { credentials: 'include' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατή η φόρτωση των αρχείων.');
+        serverFiles = data.files || [];
+        renderFiles(reconcileFiles());
+    } catch (error) {
+        if (serverFiles.length || pendingAdds.size) {
+            renderFiles(reconcileFiles());
+            return;
+        }
+        fileList.innerHTML = `<div class="empty">${error.message}</div>`;
+    }
+}
+
+// Fold the optimistic add/delete overlays into the last server list. Any overlay
+// entry that the server has caught up on is dropped, so the overlays converge to
+// empty on their own.
+function reconcileFiles() {
+    const byKey = new Map();
+    for (const f of serverFiles) byKey.set(f.key, f);
+    for (const [key, file] of pendingAdds) {
+        if (byKey.has(key)) pendingAdds.delete(key);
+        else byKey.set(key, file);
+    }
+    for (const key of [...pendingDeletes]) {
+        if (byKey.has(key)) byKey.delete(key);
+        else pendingDeletes.delete(key);
+    }
+    const files = [...byKey.values()];
+    files.sort((a, b) => String(b.uploadedAt || '').localeCompare(String(a.uploadedAt || '')));
+    return files;
+}
+
+// list() can lag a write by up to a minute; re-pull a few times so the overlay
+// clears without the user having to refresh.
+function scheduleFileResync() {
+    fileResyncTimers.forEach((t) => clearTimeout(t));
+    fileResyncTimers = [4000, 12000, 30000].map((ms) => window.setTimeout(loadFiles, ms));
+}
+
+function selectFileForReport(f, files) {
+    selectedReportFileKey = f.key;
+    selectedReportFileName = f.name;
+    showMessage(appMessage, `Το "${f.name}" επιλέχθηκε για δημιουργία αναφοράς.`, 'success');
+    reportResult.classList.remove('show');
+    reportResult.textContent = '';
+    renderFiles(files);
+}
+
+function fileSubText(f) {
+    const when = f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : '';
+    return [formatSize(f.size), when].filter(Boolean).join(' · ');
+}
+
+// More than two shared documents: collapse the list into a dropdown, with a
+// single row of actions operating on the currently selected file.
+function renderFilesDropdown(files) {
+    const wrap = document.createElement('div');
+    wrap.className = 'file-select-wrap';
+
+    const select = document.createElement('select');
+    select.id = 'file-select';
+    for (const f of files) {
+        const opt = document.createElement('option');
+        opt.value = f.key;
+        opt.textContent = [f.name, fileSubText(f)].filter(Boolean).join('  —  ');
+        select.append(opt);
+    }
+    if (selectedReportFileKey && files.some((f) => f.key === selectedReportFileKey)) {
+        select.value = selectedReportFileKey;
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const use = document.createElement('button');
+    const dl = document.createElement('a');
+    dl.textContent = 'Λήψη';
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = 'Διαγραφή';
+    actions.append(use, dl, del);
+
+    const currentFile = () => files.find((f) => f.key === select.value) || files[0];
+    const syncActions = () => {
+        const f = currentFile();
+        const isSelected = f.key === selectedReportFileKey;
+        use.textContent = isSelected ? 'Επιλεγμένο' : 'Χρήση για αναφορά';
+        use.disabled = isSelected;
+        dl.href = `/api/portal/files?key=${encodeURIComponent(f.key)}`;
+    };
+    syncActions();
+
+    select.addEventListener('change', syncActions);
+    use.addEventListener('click', () => selectFileForReport(currentFile(), files));
+    del.addEventListener('click', () => {
+        const f = currentFile();
+        deleteFile(f.key, f.name);
+    });
+
+    wrap.append(select, actions);
+    fileList.append(wrap);
+}
+
+function renderFiles(files) {
+    currentFiles = files;
+    if (!files.length) {
+        fileList.innerHTML = '<div class="empty">Δεν υπάρχουν ακόμη αρχεία. Ανεβάστε το πρώτο σας έγγραφο παραπάνω.</div>';
+        return;
+    }
+    fileList.innerHTML = '';
+
+    if (files.length > 2) {
+        renderFilesDropdown(files);
+        return;
+    }
+
+    for (const f of files) {
+        const row = document.createElement('div');
+        row.className = 'file-row';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const name = document.createElement('div');
+        name.textContent = f.name;
+        const sub = document.createElement('div');
+        sub.className = 'sub';
+        sub.textContent = fileSubText(f);
+        meta.append(name, sub);
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        const use = document.createElement('button');
+        use.textContent = f.key === selectedReportFileKey ? 'Επιλεγμένο' : 'Χρήση για αναφορά';
+        use.disabled = f.key === selectedReportFileKey;
+        use.addEventListener('click', () => selectFileForReport(f, files));
+        const dl = document.createElement('a');
+        dl.href = `/api/portal/files?key=${encodeURIComponent(f.key)}`;
+        dl.textContent = 'Λήψη';
+        const del = document.createElement('button');
+        del.className = 'del';
+        del.textContent = 'Διαγραφή';
+        del.addEventListener('click', () => deleteFile(f.key, f.name));
+        actions.append(use, dl, del);
+
+        row.append(meta, actions);
+        fileList.append(row);
+    }
+}
+
+async function deleteFile(key, name) {
+    if (!confirm(`Διαγραφή του "${name}"; Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.`)) return;
+    try {
+        const res = await fetch(`/api/portal/files?key=${encodeURIComponent(key)}`, {
+            method: 'DELETE', credentials: 'include',
+        });
+        if (!res.ok) throw new Error('Δεν ήταν δυνατή η διαγραφή του αρχείου.');
+        pendingDeletes.add(key);
+        pendingAdds.delete(key);
+        if (selectedReportFileKey === key) {
+            selectedReportFileKey = null;
+            selectedReportFileName = '';
+        }
+        showMessage(appMessage, `Το "${name}" αφαιρέθηκε από τα κοινόχρηστα έγγραφά σας.`, 'success');
+        renderFiles(reconcileFiles());
+        loadFiles();
+        scheduleFileResync();
+    } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+    }
+}
+
+function setGenerateProcessing(isProcessing) {
+    generateReportBtn.disabled = isProcessing;
+    if (isProcessing) {
+        generateReportBtn.innerHTML = 'Επεξεργασία<span class="processing-dots"><span>.</span><span>.</span><span>.</span></span>';
+        generateReportBtn.setAttribute('aria-busy', 'true');
+    } else {
+        generateReportBtn.textContent = 'Δημιουργία αναφοράς!';
+        generateReportBtn.removeAttribute('aria-busy');
+    }
+}
+
+async function startReportGeneration() {
+    if (!selectedReportFileKey) {
+        showMessage(appMessage, 'Ανεβάστε ένα αρχείο ή επιλέξτε ένα από τα κοινόχρηστα έγγραφά σας πρώτα.', 'error');
+        return;
+    }
+
+    clearMessage(appMessage);
+    reportResult.classList.remove('show');
+    reportResult.textContent = '';
+    setGenerateProcessing(true);
+
+    try {
+        const res = await fetch('/api/portal/generate-report', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fileKey: selectedReportFileKey,
+                reportType: reportType.value,
+            }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατή η έναρξη δημιουργίας αναφοράς.');
+        pollReportJob(data.jobId);
+    } catch (error) {
+        setGenerateProcessing(false);
+        showMessage(appMessage, error.message, 'error');
+    }
+}
+
+async function pollReportJob(jobId) {
+    window.clearTimeout(reportPollTimer);
+    try {
+        const res = await fetch(`/api/portal/generate-report?jobId=${encodeURIComponent(jobId)}`, {
+            credentials: 'include',
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατός ο έλεγχος της κατάστασης της αναφοράς.');
+
+        if (data.status === 'complete') {
+            setGenerateProcessing(false);
+            reportResult.textContent = `Το ${data.downloadFileName || `${data.reportLabel}.xlsx`} είναι έτοιμο. `;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = data.downloadUrl;
+            downloadLink.textContent = 'Λήψη αναφοράς Excel';
+            downloadLink.setAttribute('download', data.downloadFileName || `${data.reportLabel}.xlsx`);
+            reportResult.append(downloadLink);
+            if (data.downloadUrlPptx) {
+                reportResult.append(document.createTextNode('  '));
+                const pptxLink = document.createElement('a');
+                pptxLink.href = data.downloadUrlPptx;
+                pptxLink.textContent = 'Λήψη παρουσίασης PowerPoint';
+                pptxLink.setAttribute('download', data.downloadFileNamePptx || `${data.reportLabel}.pptx`);
+                reportResult.append(pptxLink);
+            }
+            reportResult.classList.add('show');
+            showMessage(appMessage, 'Η αναφορά δημιουργήθηκε με επιτυχία.', 'success');
+            return;
+        }
+
+        if (data.status === 'failed') {
+            throw new Error(data.error || 'Η δημιουργία της αναφοράς απέτυχε. Δοκιμάστε ξανά.');
+        }
+
+        reportPollTimer = window.setTimeout(() => pollReportJob(jobId), 2500);
+    } catch (error) {
+        setGenerateProcessing(false);
+        showMessage(appMessage, error.message, 'error');
+    }
+}
+
+generateReportBtn.addEventListener('click', startReportGeneration);
+
+// --- Chat With Us ---
+function renderChatMessages(messages) {
+    chatMessages.innerHTML = '';
+    if (!messages.length) {
+        chatMessages.innerHTML = '<div class="empty">Δεν υπάρχει προηγούμενο ιστορικό συνομιλίας. Κάντε την πρώτη σας ερώτηση παρακάτω.</div>';
+        return;
+    }
+    for (const msg of messages) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-msg ${msg.role === 'user' ? 'user' : 'assistant'}`;
+        bubble.textContent = msg.content;
+        chatMessages.append(bubble);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function loadChatHistory() {
+    chatHistoryLoaded = true;
+    try {
+        const res = await fetch('/api/portal/chat', { credentials: 'include' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατή η φόρτωση του ιστορικού συνομιλίας.');
+        renderChatMessages(data.messages || []);
+    } catch (error) {
+        chatMessages.innerHTML = `<div class="empty">${error.message}</div>`;
+    }
+}
+
+async function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    chatSendBtn.disabled = true;
+    chatInput.disabled = true;
+
+    const pendingBubble = document.createElement('div');
+    pendingBubble.className = 'chat-msg user';
+    pendingBubble.textContent = text;
+    if (chatMessages.querySelector('.empty')) chatMessages.innerHTML = '';
+    chatMessages.append(pendingBubble);
+
+    const thinkingBubble = document.createElement('div');
+    thinkingBubble.className = 'chat-msg assistant pending';
+    thinkingBubble.textContent = 'Σκέφτομαι…';
+    chatMessages.append(thinkingBubble);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    chatInput.value = '';
+
+    try {
+        const res = await fetch('/api/portal/chat', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατή η λήψη απάντησης αυτή τη στιγμή. Δοκιμάστε ξανά.');
+        renderChatMessages(data.messages || []);
+    } catch (error) {
+        thinkingBubble.classList.remove('pending');
+        thinkingBubble.textContent = error.message;
+    } finally {
+        chatSendBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
+    }
+}
+
+chatSendBtn.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+    }
+});
+
+// --- Consultation Form – Web3Forms Submission ---
+document.getElementById('consultation-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('consultation-submit-btn');
+    btn.disabled = true;
+    const previousText = btn.textContent;
+    btn.textContent = 'Αποστολή…';
+    clearMessage(appMessage);
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (result.success) {
+            showMessage(appMessage, 'Το αίτημα υποβλήθηκε με επιτυχία. Η ομάδα μας θα επικοινωνήσει μαζί σας σύντομα.', 'success');
+            this.reset();
+        } else {
+            showMessage(appMessage, result.message || result.error || 'Η υποβολή απέτυχε. Δοκιμάστε ξανά.', 'error');
+        }
+    } catch (err) {
+        showMessage(appMessage, 'Η υποβολή απέτυχε. Δοκιμάστε ξανά αργότερα.', 'error');
+        console.error('Consultation submission error', err);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = previousText || 'Υποβολή Αιτήματος ';
+    }
+});
+
+// --- Process Netlify Identity confirmation callback (activation links) and init user state ---
+(async function processAuthCallbackAndInit() {
+    // When a user clicks the activation/confirmation link in their email, they
+    // land back here with a token in the URL hash (e.g. #confirmation_token=...).
+    // handleAuthCallback() reads that hash, confirms the email, logs the user in,
+    // and returns { type, user }. It returns null on a normal page load.
+    try {
+        const result = await handleAuthCallback();
+        if (result) {
+            if (result.type === 'confirmation') {
+                // Email confirmed — the user is now authenticated. Send them
+                // straight into their dashboard with a success message.
+                showLoggedIn(result.user, true);
+                return;
+            }
+            if (result.type === 'recovery') {
+                // Password recovery link — the user is authenticated and can now
+                // sign in / update their password from the login section.
+                tabLogin.click();
+                showMessage(authMessage, 'Το email επιβεβαιώθηκε. Μπορείτε τώρα να συνδεθείτε.', 'success');
+                return;
+            }
+            if (result.user) {
+                // Any other callback that yields a session (oauth, email_change).
+                showLoggedIn(result.user);
+                return;
+            }
+        }
+    } catch (err) {
+        // Token missing, expired, or already used.
+        console.error('Auth callback error:', err);
+        tabLogin.click();
+        showMessage(authMessage, 'Αυτός ο σύνδεσμος επιβεβαίωσης δεν είναι έγκυρος ή έχει ήδη χρησιμοποιηθεί. Συνδεθείτε παρακάτω.', 'error');
+        return;
+    }
+
+    // Normal page load: restore an existing session if one is present.
+    try {
+        const current = await getUser().catch(() => null);
+        if (current) {
+            showLoggedIn(current);
+        }
+    } catch (err) {
+        // No active session — stay on the login/signup view.
+    }
+})();
+</script>
+</body>
+</html>

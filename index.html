@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reform Group of Companies</title>
+
+<script>
+// Netlify Identity sends activation/confirmation, password-recovery and invite
+// links to the site root with the token in the URL hash. The auth handling lives
+// on the client portal, so forward any such link to portal.html (preserving the
+// hash) where the token is processed and the account is activated.
+(function () {
+    var hash = window.location.hash || '';
+    if (/(confirmation_token|recovery_token|invite_token|email_change_token)=/.test(hash)) {
+        window.location.replace('portal.html' + hash);
+    }
+})();
+</script>
+
+<style>
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    color: #2b2b2b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.gateway {
+    text-align: center;
+    max-width: 720px;
+    width: 100%;
+}
+
+.member-of {
+    font-size: clamp(14px, 2.2vw, 18px);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6b6b6d;
+    margin: 0 0 28px;
+}
+
+.main-logo {
+    width: min(380px, 70vw);
+    height: auto;
+    margin-bottom: 48px;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(30px, 8vw, 90px);
+    flex-wrap: wrap;
+}
+
+.brand-link {
+    display: inline-block;
+    opacity: 0.88;
+    transition: opacity 0.25s, transform 0.25s;
+}
+
+.brand-link:hover,
+.brand-link:focus-visible {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+
+.brand-link img {
+    width: 220px;
+    max-width: 38vw;
+    height: auto;
+    display: block;
+}
+
+.gateway-footer {
+    margin-top: 56px;
+    font-size: 12px;
+    color: #6b6b6d;
+    letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="gateway">
+    <p class="member-of">Member of the:</p>
+    <img src="reform-group-logo.png" alt="Reform Group of Companies" class="main-logo">
+
+    <div class="brand-row">
+        <a href="https://business-reform.com/home.html" class="brand-link" aria-label="Go to Business Reform">
+            <img src="business-reform-gateway-logo.png" alt="Business Reform">
+        </a>
+        <a href="https://investment-reform.com/home.html" class="brand-link" aria-label="Go to Investment Reform">
+            <img src="investment-reform-gateway-logo.png" alt="Investment Reform">
+        </a>
+    </div>
+
+    <p class="gateway-footer">&copy; 2026 Reform Group of Companies. All Rights Reserved.</p>
+</div>
+
+</body>
+</html>

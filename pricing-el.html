@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="el"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Τιμολόγηση &amp; Συνδρομές | Business Reform</title>
+
+<style>
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 110px;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2b2b2b;
+    line-height: 1.6;
+    background-color: white;
+}
+
+.hero {
+    text-align: center;
+        padding: clamp(50px, 10vw, 100px) 20px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.hero h1 {
+        font-size: clamp(28px, 6vw, 48px);
+    color: #1f3b5b;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: #6b7785;
+   font-size: clamp(16px, 3vw, 20px);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+    .plan-group-title {
+    text-align: center;
+    color: #1f3b5b;
+    margin-bottom: 30px;
+}
+/* Watermark Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('logo_final.png') center center no-repeat;
+    background-size: 60%;
+    opacity: 0.10;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    background: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header img.main-logo {
+    height: 60px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #1f3b5b;
+    font-weight: 600;
+}
+
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+.lang-switch a {
+    display: block;
+    line-height: 1;
+    text-decoration: none;
+    opacity: 0.45;
+    filter: grayscale(40%);
+    transition: opacity 0.2s, filter 0.2s, transform 0.2s;
+}
+.lang-switch a svg {
+    display: block;
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(31,59,91,0.15);
+    overflow: hidden;
+}
+.lang-switch a:hover { opacity: 0.9; filter: grayscale(0%); transform: scale(1.1); }
+.lang-switch a.lang-active { opacity: 1; filter: grayscale(0%); }
+
+.li-logo {
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Mobile hamburger toggle (hidden on desktop) */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 22px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #1f3b5b;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Mobile-only: visually hide nav items until toggled */
+@media (max-width: 768px) {
+    .hero h1 { font-size: 34px; }
+
+    /* Show hamburger, collapse the nav into a dropdown */
+    .nav-toggle { display: flex; }
+
+    .nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #ffffff;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+
+    .nav.open { display: flex; }
+
+    .nav a {
+        margin: 0;
+        width: 100%;
+        padding: 12px 24px;
+        box-sizing: border-box;
+    }
+
+    /* Make the desktop-only row wrapper transparent to layout on mobile,
+       so its links stack individually in the dropdown exactly as before. */
+    .nav-links {
+        display: contents;
+    }
+    .lang-switch {
+        margin-top: 0;
+    }
+
+    /* Animate hamburger into an X when open */
+    .nav-toggle.open span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+}
+
+/* Pricing section */
+.pricing-section {
+    padding: 60px 40px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.plan-card {
+    border: 1px solid #d0dce8;
+    border-top: 4px solid #1f3b5b;
+    padding: 35px 30px;
+    border-radius: 12px;
+    background: #fff;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(31,59,91,0.12);
+}
+
+.plan-card.featured {
+    border-top-color: #c8a24a;
+    box-shadow: 0 8px 24px rgba(31,59,91,0.10);
+}
+
+.plan-badge {
+    display: inline-block;
+    align-self: flex-start;
+    background: #c8a24a;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.plan-card h3 {
+    color: #1f3b5b;
+    margin: 0 0 6px;
+    font-size: 22px;
+}
+
+.plan-card .plan-sub {
+    color: #6b7785;
+    font-size: 14px;
+    margin: 0 0 22px;
+}
+
+.plan-price {
+    font-size: 40px;
+    font-weight: 700;
+    color: #1f3b5b;
+    line-height: 1;
+}
+
+.plan-price .period {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7785;
+}
+
+.plan-note {
+    font-size: 13px;
+    color: #4a8a5c;
+    font-weight: 600;
+    margin: 10px 0 0;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 24px 0 28px;
+    flex-grow: 1;
+}
+
+.plan-features li {
+    padding: 8px 0 8px 26px;
+    position: relative;
+    color: #444;
+    font-size: 15px;
+    border-bottom: 1px solid #f0f3f7;
+}
+
+.plan-features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #1f3b5b;
+    font-weight: 700;
+}
+
+.plan-button {
+    background: #1f3b5b;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: 0.3s;
+}
+
+.plan-button:hover { background: #2c5380; }
+
+.plan-card.featured .plan-button { background: #c8a24a; }
+.plan-card.featured .plan-button:hover { background: #b58f3a; }
+
+.pricing-note {
+    text-align: center;
+    color: #6b7785;
+    font-size: 14px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Footer */
+.footer {
+    background: #1f3b5b;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+   <a href="index-el.html#home"><img src="logo_final.png" alt="Business Reform Logo" class="main-logo"></a>
+
+    <!-- Mobile hamburger toggle (visible only on small screens via CSS) -->
+    <button class="nav-toggle" aria-label="Εναλλαγή μενού πλοήγησης" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="nav" id="primary-nav">
+        <div class="nav-links">
+            <a href="index-el.html#home">Αρχική</a>
+            <a href="index-el.html#services">Υπηρεσίες</a>
+            <a href="index-el.html#ai-solutions">Λύσεις AI CFO</a>
+            <a href="pricing-el.html">Τιμολόγηση</a>
+            <a href="portal-el.html">Πύλη Πελατών</a>
+            <a href="index-el.html#about">Σχετικά</a>
+            <a href="index-el.html#contact">Επικοινωνία</a>
+        </div>
+        <span class="lang-switch">
+            <a href="pricing-el.html" class="lang-flag lang-active" aria-label="Ελληνικά" title="Ελληνικά">
+                <svg viewBox="0 0 27 18" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <rect width="27" height="18" fill="#0D5EAF"/>
+                    <path d="M0,2H27M0,6H27M0,10H27M0,14H27" stroke="#fff" stroke-width="2"/>
+                    <rect width="10" height="10" fill="#0D5EAF"/>
+                    <path d="M5,0V10M0,5H10" stroke="#fff" stroke-width="2"/>
+                </svg>
+            </a>
+            <a href="Pricing.html" class="lang-flag" aria-label="English" title="English">
+                <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <defs><clipPath id="uk-clip-pricing-el"><rect width="60" height="40"/></clipPath></defs>
+                    <g clip-path="url(#uk-clip-pricing-el)">
+                        <rect width="60" height="40" fill="#012169"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="14"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="8"/>
+                    </g>
+                </svg>
+            </a>
+        </span>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Πλάνα &amp; Τιμολόγηση</h1>
+    <p>Επιλέξτε τη συνδρομή που ταιριάζει σε εσάς — είτε είστε μεμονωμένος επαγγελματίας είτε επιχειρηματική ομάδα που χρειάζεται χρηματοοικονομική αναφορά με Τεχνητή Νοημοσύνη για πολλούς χρήστες.</p>
+</div>
+
+<div class="pricing-section">
+    <h2 class="plan-group-title">Ατομικά Πλάνα</h2>
+    <div class="pricing-grid">
+        <div class="plan-card">
+            <h3>Μηνιαίο Ατομικό</h3>
+            <p class="plan-sub">Για μεμονωμένους επαγγελματίες, χρέωση μηνιαίως</p>
+            <div class="plan-price">€9.99<span class="period"> / μήνα</span></div>
+            <ul class="plan-features">
+                <li>Πρόσβαση για έναν χρήστη</li>
+                <li>Πλήρης σουίτα αναφορών AI CFO</li>
+                <li>Εξαγωγές σε Excel</li>
+                <li>Χρηματοοικονομική Συμβουλευτική κατόπιν αιτήματος </li>
+                <li>Ακύρωση οποιαδήποτε στιγμή</li>
+            </ul>
+            <a class="plan-button" href="mailto:info@business-reform.com">Ξεκινήστε τώρα</a>
+        </div>
+
+        <div class="plan-card featured">
+            <span class="plan-badge">Καλύτερη Αξία</span>
+            <h3>Ετήσιο Ατομικό</h3>
+            <p class="plan-sub">Για μεμονωμένους επαγγελματίες, χρέωση ετησίως</p>
+            <div class="plan-price">€99.99<span class="period"> / έτος</span></div>
+            <p class="plan-note">Εξοικονομήστε πάνω από 16% σε σχέση με τη μηνιαία χρέωση</p>
+            <ul class="plan-features">
+                <li>Πρόσβαση για έναν χρήστη</li>
+                <li>Πλήρης σουίτα αναφορών AI CFO</li>
+                <li>Εξαγωγές σε Excel</li>
+                 <li>Χρηματοοικονομική Συμβουλευτική κατόπιν αιτήματος </li>
+                <li>Υποστήριξη email με προτεραιότητα</li>
+            </ul>
+            <a class="plan-button" href="mailto:info@business-reform.com">Ξεκινήστε τώρα</a>
+        </div>
+    </div>
+
+    <h2 class="plan-group-title">Επιχειρηματικά Πλάνα</h2>
+    <div class="pricing-grid">
+        <div class="plan-card">
+            <h3>Μηνιαίο Επιχειρηματικό</h3>
+            <p class="plan-sub">Για ομάδες, χρέωση μηνιαίως</p>
+            <div class="plan-price">€49.99<span class="period"> / μήνα</span></div>
+            <ul class="plan-features">
+                <li>Πολλαπλά email χρηστών για λήψεις</li>
+                <li>Πλήρης σουίτα αναφορών AI CFO</li>
+                <li>Εξατομικευμένες εξαγωγές αναφορών σε μορφή Excel &amp; PowerPoint</li>
+                <li>Πρόσβαση συνεργασίας ομάδας</li>
+                <li>Δέκα ώρες δωρεάν χρηματοοικονομικής συμβουλευτικής μηνιαίως</li>
+
+            </ul>
+            <a class="plan-button" href="mailto:info@business-reform.com">Επικοινωνήστε με την Ομάδα Συμβούλων</a>
+        </div>
+
+        <div class="plan-card featured">
+            <span class="plan-badge">Καλύτερη Αξία</span>
+            <h3>Ετήσιο Επιχειρηματικό</h3>
+            <p class="plan-sub">Για ομάδες, χρέωση ετησίως</p>
+            <div class="plan-price">€499.99<span class="period"> / έτος</span></div>
+            <p class="plan-note">Εξοικονομήστε πάνω από 16% σε σχέση με τη μηνιαία χρέωση</p>
+            <ul class="plan-features">
+                <li>Πολλαπλά email χρηστών για λήψεις</li>
+                <li>Πλήρης σουίτα αναφορών AI CFO</li>
+                <li>Εξατομικευμένες εξαγωγές αναφορών σε μορφή Excel &amp; PowerPoint</li>
+                <li>Πλήρης έκτακτη χρηματοοικονομική συμβουλευτική</li>
+
+            </ul>
+            <a class="plan-button" href="mailto:info@business-reform.com">Επικοινωνήστε με την Ομάδα Συμβούλων</a>
+        </div>
+    </div>
+
+    <p class="pricing-note">Όλες οι τιμές περιλαμβάνουν ΦΠΑ (24%). Τα επιχειρηματικά πλάνα επιτρέπουν πολλαπλά email χρηστών για λήψη αναφορών στο πλαίσιο μίας ενιαίας συνδρομής. Επικοινωνήστε μαζί μας για να ενεργοποιήσετε τη συνδρομή σας ή για να ζητήσετε ένα εξατομικευμένο πακέτο για την ομάδα σας.</p>
+</div>
+
+<div class="footer">
+    <p>© 2026 Business Reform | Με την επιφύλαξη παντός δικαιώματος</p>
+    <a href="https://www.linkedin.com/company/business-reform" target="_blank">
+        <img src="./linkedinpng.png" alt="LinkedIn" class="li-logo"> Ακολουθήστε μας στο LinkedIn
+    </a>
+</div>
+
+<script>
+// Mobile-only nav toggle behaviour; script runs on all devices but affects visibility only via CSS media queries
+(function () {
+    var toggle = document.querySelector('.nav-toggle');
+    var nav = document.getElementById('primary-nav');
+
+    if (!toggle || !nav) return;
+
+    toggle.addEventListener('click', function () {
+        var isOpen = nav.classList.toggle('open');
+        toggle.classList.toggle('open', isOpen);
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    // Close the menu when a nav link is clicked (mobile behaviour)
+    nav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (nav.classList.contains('open')) {
+                nav.classList.remove('open');
+                toggle.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
+})();
+</script>
+
+</body></html>

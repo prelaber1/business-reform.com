@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Reform</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<script>
+// Netlify Identity sends activation/confirmation, password-recovery and invite
+// links to the site root with the token in the URL hash. The auth handling lives
+// on the client portal, so forward any such link to portal.html (preserving the
+// hash) where the token is processed and the account is activated.
+(function () {
+    var hash = window.location.hash || '';
+    if (/(confirmation_token|recovery_token|invite_token|email_change_token)=/.test(hash)) {
+        window.location.replace('portal.html' + hash);
+    }
+})();
+</script>
+
+
+
+
+<style>
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 110px; /* adjust to your header height */
+}
+
+    body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2b2b2b;
+    line-height: 1.6;
+    background-color: white;
+}
+
+    /* Watermark Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: url('logo_final.png') center center no-repeat;
+    background-size: 60%;
+
+    opacity: 0.10;
+
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    background: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header img.main-logo {
+    height: 60px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+}
+
+.nav a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #1f3b5b;
+    font-weight: 600;
+}
+
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+.lang-switch a {
+    display: block;
+    line-height: 1;
+    text-decoration: none;
+    opacity: 0.45;
+    filter: grayscale(40%);
+    transition: opacity 0.2s, filter 0.2s, transform 0.2s;
+}
+.lang-switch a svg {
+    display: block;
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(31,59,91,0.15);
+    overflow: hidden;
+}
+.lang-switch a:hover { opacity: 0.9; filter: grayscale(0%); transform: scale(1.1); }
+.lang-switch a.lang-active { opacity: 1; filter: grayscale(0%); }
+
+/* Mobile hamburger toggle (hidden on desktop) */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 22px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-toggle span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #1f3b5b;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Small LinkedIn Logo Style */
+.li-logo {
+    height: 18px; /* Matches text height */
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Hero */
+.hero {
+    background: linear-gradient(rgba(31,59,91,0.85), rgba(31,59,91,0.85)), url('https://images.unsplash.com/photo-1521791136064-7986c2920216');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: clamp(50px, 10vw, 100px) 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: clamp(28px, 6vw, 48px);
+    margin-bottom: 20px;
+}
+
+.hero p {
+    font-size: clamp(16px, 3vw, 20px);
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* Sections */
+.section {
+    padding: 60px 40px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.section h2 {
+    color: #1f3b5b;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Services */
+.services {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    border: 1px solid #eee;
+    padding: 25px;
+    border-radius: 10px;
+    background: #fff;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+
+/* About */
+.about {
+    background: #f7f9fb;
+}
+
+/* Contact Layout */
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-form input, .contact-form textarea {
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+}
+
+.contact-form button {
+    background: #1f3b5b;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.contact-form button:hover {
+    background: #2c5380;
+}
+
+.map-container iframe {
+    width: 100%;
+    height: 350px;
+    border-radius: 10px;
+    border: none;
+}
+
+/* AI CFO Solutions */
+.ai-solutions-intro {
+    background: linear-gradient(135deg, #1f3b5b 0%, #2c5380 100%);
+    color: white;
+    padding: 50px 40px;
+    text-align: center;
+}
+
+.ai-solutions-intro h2 {
+    color: white;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.ai-solutions-intro p {
+    font-size: 18px;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.7;
+    opacity: 0.95;
+}
+
+.ai-cards-section {
+    padding: 60px 40px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.ai-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 10px;
+}
+
+.ai-card {
+    border: 1px solid #d0dce8;
+    padding: 30px;
+    border-radius: 12px;
+    background: #fff;
+    transition: 0.3s;
+    border-top: 4px solid #1f3b5b;
+}
+
+.ai-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(31,59,91,0.12);
+}
+
+.ai-card h3 {
+    color: #1f3b5b;
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 18px;
+}
+
+.ai-card p {
+    margin: 0;
+    color: #444;
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.ai-card .card-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+}
+
+/* Partners */
+.partners-intro {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto;
+    color: #444;
+}
+
+.partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.partner-card {
+    border: 1px solid #d0dce8;
+    border-radius: 12px;
+    background: #fff;
+    padding: 30px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: 0.3s;
+}
+
+.partner-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(31,59,91,0.12);
+}
+
+.partner-card img {
+    max-width: 100%;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 18px;
+}
+
+.partner-card h3 {
+    color: #1f3b5b;
+    margin: 0 0 6px;
+    font-size: 18px;
+}
+
+.partner-card p {
+    color: #6b7785;
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Footer */
+.footer {
+    background: #1f3b5b;
+    color: white;
+    text-align: center;
+    padding: 40px;
+}
+
+.footer a {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .contact-container {
+        grid-template-columns: 1fr;
+    }
+
+    /* Show hamburger, collapse the nav into a dropdown */
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #ffffff;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    }
+
+    .nav.open {
+        display: flex;
+    }
+
+    .nav a {
+        margin: 0;
+        width: 100%;
+        padding: 12px 40px;
+        box-sizing: border-box;
+    }
+
+    /* Make the desktop-only row wrapper transparent to layout on mobile,
+       so its links stack individually in the dropdown exactly as before. */
+    .nav-links {
+        display: contents;
+    }
+    .lang-switch {
+        margin-top: 0;
+    }
+
+    /* Animate hamburger into an X when open */
+    .nav-toggle.open span:nth-child(1) {
+        transform: translateY(9.5px) rotate(45deg);
+    }
+
+    .nav-toggle.open span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .nav-toggle.open span:nth-child(3) {
+        transform: translateY(-9.5px) rotate(-45deg);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+   <a href="#home"><img src="logo_final.png" alt="Business Reform Logo" class="main-logo"></a>
+    <button class="nav-toggle" aria-label="Εναλλαγή μενού πλοήγησης" aria-expanded="false" aria-controls="primary-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="nav" id="primary-nav">
+        <div class="nav-links">
+            <a href="#home">Αρχική</a>
+            <a href="#services">Υπηρεσίες</a>
+            <a href="#ai-solutions">Λύσεις AI CFO & Δεδομένων</a>
+            <a href="pricing-el.html">Τιμολόγηση</a>
+            <a href="portal-el.html">Πύλη Πελατών</a>
+            <a href="#partners">Συνεργάτες</a>
+            <a href="#about">Σχετικά</a>
+            <a href="FAQ-el.html">FAQ</a>
+            <a href="#contact">Επικοινωνία</a>
+        </div>
+        <span class="lang-switch">
+            <a href="index-el.html" class="lang-flag lang-active" aria-label="Ελληνικά" title="Ελληνικά">
+                <svg viewBox="0 0 27 18" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <rect width="27" height="18" fill="#0D5EAF"/>
+                    <path d="M0,2H27M0,6H27M0,10H27M0,14H27" stroke="#fff" stroke-width="2"/>
+                    <rect width="10" height="10" fill="#0D5EAF"/>
+                    <path d="M5,0V10M0,5H10" stroke="#fff" stroke-width="2"/>
+                </svg>
+            </a>
+            <a href="home.html" class="lang-flag" aria-label="English" title="English">
+                <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <defs><clipPath id="uk-clip-index-el"><rect width="60" height="40"/></clipPath></defs>
+                    <g clip-path="url(#uk-clip-index-el)">
+                        <rect width="60" height="40" fill="#012169"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="14"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="8"/>
+                    </g>
+                </svg>
+            </a>
+        </span>
+    </div>
+</div>
+
+<div class="hero" id="home">
+    <h1>Μεταμορφώνουμε Επιχειρήσεις. Παραδίδουμε Αποτελέσματα.</h1>
+    <p>Συμβουλευτικές υπηρεσίες υψηλής προστιθέμενης αξίας με έμφαση στην επιχειρηματική ανάλυση, την ενσωμάτωση Τεχνητής Νοημοσύνης και την αύξηση εσόδων.</p>
+    <p>Μετατρέψτε τα δεδομένα σας από ERP, λογιστικά συστήματα και Excel σε εκτελεστικά dashboards και προβλέψεις μέσω Τεχνητής Νοημοσύνης. Εξατομικευμένες λύσεις χρηματοοικονομικής αναφοράς και προετοιμασίας δεδομένων με χρήση AI.</p>
+<p>Ο συνεργάτης σας σε λύσεις CFO και Δεδομένων</p>
+</div>
+
+<div class="section" id="services">
+    <h2>Οι Υπηρεσίες μας</h2>
+    <div class="services">
+        <div class="card">
+            <h3>Χρηματοοικονομική Συμβουλευτική</h3>
+            <p>Συντάσσουμε ολοκληρωμένα επιχειρηματικά σχέδια και αποτιμήσεις έργων, εντοπίζουμε το κενό χρηματοδότησής σας και σας συμβουλεύουμε για τις καλύτερες επιλογές χρηματοδότησης για τους στόχους σας. Προετοιμάζουμε επίσης και οργανώνουμε τα χρηματοοικονομικά στοιχεία που χρειάζεται η τράπεζα ή οι επενδυτές σας για να προχωρήσει η χρηματοδότηση.</p>
+        </div>
+        <div class="card">
+            <h3>Στρατηγική & Μετασχηματισμός</h3>
+            <p>Βοηθάμε τις ηγετικές ομάδες να πλοηγηθούν σε κρίσιμα σημεία καμπής της επιχειρηματικής ανάλυσης — σχεδιάζοντας και υλοποιώντας ατζέντες μετασχηματισμού που οδηγούν σε μετρήσιμη βελτίωση απόδοσης, αύξηση εσόδων και μακροπρόθεσμη αξία της επιχείρησης, με την Τεχνητή Νοημοσύνη στο επίκεντρο. Εντοπίζουμε δομικές αναποτελεσματικότητες και εφαρμόζουμε βελτιώσεις διαδικασιών που μειώνουν το κόστος, αυξάνουν την ευελιξία και ενισχύουν την οργανωσιακή ανθεκτικότητα.</p>
+        </div>
+        <div class="card">
+            <h3>Διαχείριση Έργων</h3>
+            <p>Παρέχουμε ολοκληρωμένη διακυβέρνηση προγραμμάτων και εποπτεία υλοποίησης σε όλους τους κλάδους — διασφαλίζοντας ότι σύνθετες πρωτοβουλίες με πολλαπλά ενδιαφερόμενα μέρη υλοποιούνται με αυστηρότητα, εντός χρονοδιαγράμματος και εντός του συμφωνηθέντος πλαισίου.</p>
+        </div>
+        <div class="card">
+            <h3>Ψηφιακός Μετασχηματισμός</h3>
+            <p>Καθοδηγούμε τους οργανισμούς στη στρατηγική υιοθέτηση αναδυόμενων τεχνολογιών, ενσωματώνοντας δυνατότητες βασισμένες σε Τεχνητή Νοημοσύνη. Εγγραφείτε, επιλέξτε την αναφορά που χρειάζεστε και δημιουργήστε την για την περίοδο που επιθυμείτε. Αν χρειάζεστε πιο εξειδικευμένες λύσεις, επικοινωνήστε με τους συμβούλους μας.</p>
+        </div>
+    </div>
+</div>
+
+<div id="ai-solutions">
+    <div class="ai-solutions-intro">
+        <h2>Λύσεις AI CFO</h2>
+        <p>Βελτιώστε τη ρευστότητα, εξασφαλίστε υψηλότερη κερδοφορία, λάβετε ταχύτερες αποφάσεις, παρέχετε καλύτερη αναφορά σε ιδιοκτήτες και επενδυτές, μειώστε τη λειτουργική σπατάλη μέσω
+αυτοματισμού Τεχνητής Νοημοσύνης που εξοικονομεί προσωπικό και χρόνο.<br>
+        Βήμα 1: Εγγραφή<br>
+        Βήμα 2: Επιλέξτε τη χρηματοοικονομική αναφορά ή/και τη λειτουργία προετοιμασίας δεδομένων που χρειάζεστε<br>
+        Βήμα 3: Ανεβάστε οποιοδήποτε σχετικό λογιστικό ή χρηματοοικονομικό έγγραφο, ενδιάμεσης ή πλήρους περιόδου<br>
+        Βήμα 4: Δημιουργήστε την αναφορά σας ή/και τα μορφοποιημένα δεδομένα σας</p><br>
+
+     <p><h3>Χρησιμοποιήστε δωρεάν την δοκιμαστική περίοδο 14 ημερών και ελέγξτε την χρηματοοικονομική θέση της εταιρείας σας</h3></p><br>
+        <a href="portal-el.html" class="signup-button">Εγγραφείτε εδώ!</a>
+<style>
+  .signup-button {
+    /* Layout & Spacing */
+    display: inline-block;
+    padding: 12px 24px;
+
+    /* Typography */
+    color: #27C8F5;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+
+    /* Button Aesthetics */
+    background-color:#7393B3; /* Primary Blue */
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    /* Smooth Transition for Hover Effect */
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  /* Hover and Active States for better UX */
+  .signup-button:hover {
+    background-color: #0056b3; /* Darker Blue */
+  }
+
+  .signup-button:active {
+    transform: scale(0.98); /* Slight click effect */
+  }
+</style>
+
+
+    </div>
+
+    <div class="ai-cards-section">
+        <div class="ai-cards">
+            <div class="ai-card">
+                <span class="card-icon">📈</span>
+                <h3>Report Χρηματοοικονομικών Προβλέψεων</h3>
+                <p>Παρέχει σε κάθε ενδιαφερόμενο μέρος χρηματοοικονομικές προβλέψεις που καλύπτουν 3–5 έτη. Περιλαμβάνει προβλεπόμενα έσοδα, έξοδα, EBITDA και ταμειακές ροές — παρουσιαζόμενα μηνιαία για το 1ο έτος, και τριμηνιαία ή ετήσια στη συνέχεια.</p>
+            </div>
+            <div class="ai-card">
+                <span class="card-icon">⚖️</span>
+                <h3>Report Ανάλυσης Νεκρού Σημείου</h3>
+                <p>Παρέχει λεπτομερή ανάλυση της κερδοφορίας και βιωσιμότητας της επιχείρησής σας — απαιτείται συνήθως σε αιτήματα χρηματοδότησης για νεοφυείς επιχειρήσεις και επέκταση. Δείχνει καθαρά πώς καλύπτετε τα σταθερά και μεταβλητά κόστη σας.</p>
+            </div>
+            <div class="ai-card">
+                <span class="card-icon">🔥</span>
+                <h3>Report Ρυθμού Κατανάλωσης Κεφαλαίου</h3>
+                <p>Βασικό report σε γύρους χρηματοδότησης νεοφυών επιχειρήσεων, δείχνει πώς δαπανάτε τα διαθέσιμα κεφάλαιά σας και πόσοι μήνες λειτουργίας απομένουν. Δίνει στους επενδυτές και τα ενδιαφερόμενα μέρη μια διαφανή εικόνα της χρηματοδοτικής σας αυτονομίας.</p>
+            </div>
+            <div class="ai-card">
+                <span class="card-icon">📊</span>
+                <h3>Πίνακας Δεικτών Απόδοσης (KPI)</h3>
+                <p>Μια συνοπτική εικόνα της τρέχουσας απόδοσής σας μέσω βασικών δεικτών απόδοσης (KPI), μαζί με τους αντίστοιχους στόχους — δίνοντας στη διοίκηση και τους επενδυτές σαφή εικόνα του πού βρίσκεστε και προς τα πού κατευθύνεστε.</p>
+            </div>
+            <div class="ai-card">
+                <span class="card-icon">💰</span>
+                <h3>Report Χρήσης Κεφαλαίων</h3>
+                <p>Εξηγεί με ακρίβεια πώς σκοπεύετε να διαθέσετε τα ζητούμενα κεφάλαια — καλύπτοντας τομείς όπως προσλήψεις, εξοπλισμό, marketing, ανάπτυξη προϊόντος και κεφάλαιο κίνησης — χτίζοντας αξιοπιστία και εμπιστοσύνη επενδυτών.</p>
+            </div>
+            <div class="ai-card">
+                <span class="card-icon">💰</span>
+                <h3>Report Αναδιάρθρωσης Κεφαλαίου</h3>
+                <p>Παρουσιάζει μια βελτιστοποιημένη ισορροπία μεταξύ δανειακής και ιδιοκεφαλαιακής χρηματοδότησης, αξιολογεί ευκαιρίες αναχρηματοδότησης και αναδεικνύει επιλογές για τη βελτιστοποίηση του κόστους χρηματοδότησης, την ενίσχυση του ισολογισμού και την υποστήριξη των μακροπρόθεσμων επιχειρηματικών στόχων. Αναδιαμορφώνει τις αναφορές σας βάσει αναδιάρθρωσης χρέους, προσαρμογών ιδίων κεφαλαίων και εναλλακτικών λύσεων χρηματοδότησης προσαρμοσμένων στους στρατηγικούς στόχους της εταιρείας.</p>
+            </div>
+             <div class="ai-card">
+                <span class="card-icon">💰</span>
+                <h3>Report Πρόβλεψης Ταμειακών Ροών (13-Week / 12-Month)</h3>
+                <p>Παρέχει σε κάθε ενδιαφερόμενο μέρος μια συνεχώς ενημερωμένη εικόνα της βραχυπρόθεσμης ρευστότητας. Περιλαμβάνει προβλεπόμενες ταμειακές εισροές, εκροές και καθαρή ταμειακή θέση — παρουσιαζόμενες σε εβδομαδιαία βάση για ορίζοντα 13 εβδομάδων και σε μηνιαία βάση για κυλιόμενο ορίζοντα 12 μηνών.</p>
+            </div>
+            
+            <div class="ai-card">
+                <span class="card-icon">📊</span>
+                <h3> Έγγραφο ανάλυσης επιχειρηματικών αναγκών - BRD</h3>
+                <p>Το BRD (Business Requirements Document) λειτουργεί ως γέφυρα μεταξύ των επιχειρηματικών ενδιαφερόμενων μερών και των ομάδων έργου, διασφαλίζοντας κοινή κατανόηση των επιχειρηματικών αναγκών πριν σχεδιαστεί ή υλοποιηθεί οποιαδήποτε τεχνική λύση.</p>
+            </div>
+
+            <div class="ai-card">
+                <span class="card-icon">📊</span>
+                <h3>Έγγραφο ανάλυσης λειτουργικών αναγκών - FRD</h3>
+                <p>Το FRD (Functional Requirements Document) λειτουργεί ως το σχέδιο για την ανάπτυξη και τον έλεγχο της λύσης, διασφαλίζοντας ότι οι προγραμματιστές, οι ελεγκτές και τα ενδιαφερόμενα μέρη έχουν σαφή και κοινή κατανόηση της λειτουργικότητας που απαιτείται για την κάλυψη των εγκεκριμένων επιχειρηματικών απαιτήσεων.</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="section" id="partners">
+    <h2>Οι Συνεργάτες μας</h2>
+    <p class="partners-intro">Συνεργαζόμαστε με έμπιστους ειδικούς για να επεκτείνουμε τις συμβουλευτικές μας δυνατότητες σε νομικά, στρατηγικά και τεχνολογικά ζητήματα.</p>
+    <div class="partners-grid">
+        <a class="partner-card" href="https://stameft.com" target="_blank" rel="noopener">
+            <img src="partner-selaw.png" alt="Δικηγορική Εταιρεία Σταματόπουλος Ευτυχίδου (SE Law)">
+            <h3>Δικηγορική Εταιρεία Σταματόπουλος Ευτυχίδου (SE Law)</h3>
+            <p>Νομική &amp; Εταιρική Συμβουλευτική</p>
+        </a>
+        <a class="partner-card" href="https://esbconsulting.gr/el" target="_blank" rel="noopener">
+            <img src="partner-esb.png" alt="ESB Consulting">
+            <h3>ESB Consulting</h3>
+            <p>Περιβαλλοντική &amp; Επιχειρηματική Στρατηγική</p>
+        </a>
+        <a class="partner-card" href="https://prelab.gr" target="_blank" rel="noopener">
+            <img src="partner-prelab.png" alt="Prelab Creative Space">
+            <h3>Prelab Creative Space</h3>
+            <p>Δημιουργικός Χώρος &amp; Σχεδιασμός</p>
+        </a>
+    </div>
+</div>
+
+<div class="section about" id="about">
+    <h2>Σχετικά με εμάς</h2>
+    <p>Η ηγετική μας ομάδα διαθέτει βαθιά τεχνογνωσία σε πολλούς κλάδους, καλύπτοντας τη συμβουλευτική διοίκησης, την εταιρική στρατηγική και την υλοποίηση προγραμμάτων μεγάλης κλίμακας. Τα στελέχη μας έχουν διατελέσει σε ανώτερες συμβουλευτικές και διευθυντικές θέσεις σε διεθνώς αναγνωρισμένους οργανισμούς — όπως IBM, Grant Thornton, Eurobank, PwC και Accenture — αποκτώντας σημαντική εμπειρία σε κλάδους τεχνολογίας, ενέργειας, βιωσιμότητας και αεροπλοϊας. Αυτό το εύρος πρακτικής γνώσης μάς επιτρέπει να προσεγγίζουμε κάθε ανάθεση με αυστηρότητα και τεκμηρίωση, παρέχοντας το επίπεδο λεπτομέρειας και εκτέλεσης που αναμένουν οι πελάτες μας.</p>
+</div>
+
+<div class="section" id="contact">
+    <h2>Επικοινωνήστε μαζί μας</h2>
+    <div class="contact-container">
+        <div class="contact-info">
+            <form class="contact-form"
+      action="https://api.web3forms.com/submit"
+      method="POST">
+
+    <!-- Web3Forms Access Key -->
+    <input type="hidden"
+           name="access_key"
+           value="827b5e3f-5f25-496a-ae39-0eded16449c6">
+
+    <input type="text"
+           name="name"
+           placeholder="Το όνομά σας"
+           required>
+
+    <input type="email"
+           name="email"
+           placeholder="Το email σας"
+           required>
+
+    <input type="text"
+           name="subject"
+           placeholder="Θέμα">
+
+    <textarea name="message"
+              rows="5"
+              placeholder="Το μήνυμά σας"
+              required></textarea>
+
+    <button type="submit">Αποστολή Μηνύματος</button>
+</form>
+            <p style="margin-top: 20px;">
+                <strong>Email:</strong> info@business-reform.com<br>
+                <strong>Διεύθυνση:</strong> Διδότου 17, 10680 Αθήνα
+            </p>
+        </div>
+
+        <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3144.775749349224!2d23.734653210653228!3d37.98236240005926!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14a1bd3785962e45%3A0x29ca737130d03eae!2zzpTOuc60z4zPhM6_z4UgMTcsIM6RzrjOrs69zrEgMTA2IDgw!5e0!3m2!1sel!2sgr!4v1778504157558!5m2!1sel!2sgr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+
+            </iframe>
+            <p><a href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3144.775749349224!2d23.734653210653228!3d37.98236240005926!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14a1bd3785962e45%3A0x29ca737130d03eae!2zzpTOuc60z4zPhM6_z4UgMTcsIM6RzrjOrs69zrEgMTA2IDgw!5e0!3m2!1sel!2sgr!4v1778504157558!5m2!1sel!2sgr" target="_blank" style="font-size: 14px; color: #1f3b5b; text-decoration: underline;">Προβολή στο Google Maps</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© 2026 Business Reform | Με την επιφύλαξη παντός δικαιώματος</p>
+    <a href="https://www.linkedin.com/company/business-reform/" target="_blank">
+        <img src="linkedinpng.png" alt="LinkedIn" class="li-logo"> Ακολουθήστε μας στο LinkedIn
+    </a>
+    <a href="https://www.tiktok.com/@group_reform" target="_blank">
+        <img src="tiktok_logo.png" alt="TikTok" class="li-logo"> Βρείτε μας στο TikTok
+    </a>
+</div>
+
+<!-- Success Popup -->
+<div id="success-popup">
+    Το μήνυμα στάλθηκε με επιτυχία!
+</div>
+
+<style>
+#success-popup {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: #1f3b5b;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s ease;
+    z-index: 9999;
+}
+
+#success-popup.show {
+    opacity: 1;
+    visibility: visible;
+}
+</style>
+
+<script>
+const form = document.querySelector(".contact-form");
+const popup = document.getElementById("success-popup");
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        popup.classList.add("show");
+
+        form.reset();
+
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 3000);
+    }
+});
+</script>
+
+<!-- Success Popup -->
+<div id="success-popup">
+    Το μήνυμα στάλθηκε με επιτυχία!
+</div>
+
+<style>
+#success-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: #1f3b5b;
+    color: white;
+
+    padding: 20px 35px;
+    border-radius: 10px;
+
+    font-weight: 600;
+    font-size: 18px;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+
+    z-index: 9999;
+    text-align: center;
+}
+
+#success-popup.show {
+    opacity: 1;
+    visibility: visible;
+}
+</style>
+
+<script>
+const form = document.querySelector(".contact-form");
+const popup = document.getElementById("success-popup");
+
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+        popup.classList.add("show");
+
+        form.reset();
+
+       // Hide popup after 3 seconds
+        setTimeout(() => {
+            popup.classList.remove("show");
+        }, 3000);
+
+            // Redirect to homepage
+            window.location.href = "#home";
+        }, 3000);
+    }
+});
+</script>
+
+
+
+<script>
+// Mobile navigation: toggle the dropdown menu open/closed.
+(function () {
+    var toggle = document.querySelector(".nav-toggle");
+    var nav = document.getElementById("primary-nav");
+
+    if (toggle && nav) {
+        toggle.addEventListener("click", function () {
+            var isOpen = nav.classList.toggle("open");
+            toggle.classList.toggle("open", isOpen);
+            toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+
+        // Close the menu after a link is selected on mobile.
+        nav.querySelectorAll("a").forEach(function (link) {
+            link.addEventListener("click", function () {
+                nav.classList.remove("open");
+                toggle.classList.remove("open");
+                toggle.setAttribute("aria-expanded", "false");
+            });
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

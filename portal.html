@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal | Business Reform</title>
+<style>
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2b2b2b;
+    line-height: 1.6;
+    background-color: white;
+}
+
+/* Watermark Background */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('logo_final.png') center center no-repeat;
+    background-size: 60%;
+    opacity: 0.08;
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    background: #ffffff;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.header img.main-logo { height: 60px; }
+.nav { display: flex; align-items: center; }
+.nav a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: #1f3b5b;
+    font-weight: 600;
+}
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 20px;
+}
+.lang-switch a {
+    display: block;
+    line-height: 1;
+    text-decoration: none;
+    opacity: 0.45;
+    filter: grayscale(40%);
+    transition: opacity 0.2s, filter 0.2s, transform 0.2s;
+}
+.lang-switch a svg {
+    display: block;
+    width: 24px;
+    height: 16px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(31,59,91,0.15);
+    overflow: hidden;
+}
+.lang-switch a:hover { opacity: 0.9; filter: grayscale(0%); transform: scale(1.1); }
+.lang-switch a.lang-active { opacity: 1; filter: grayscale(0%); }
+
+/* Portal shell */
+.portal {
+    max-width: 1000px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+.portal-intro { text-align: center; margin-bottom: 30px; }
+.portal-intro h1 { color: #1f3b5b; margin-bottom: 8px; font-size: 34px; }
+.portal-intro p { color: #555; margin: 0; }
+
+.panel {
+    border: 1px solid #e3e9f0;
+    border-top: 4px solid #1f3b5b;
+    border-radius: 12px;
+    background: #fff;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(31,59,91,0.08);
+}
+
+/* Auth tabs */
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+.tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #d0dce8;
+    background: #f7f9fb;
+    color: #1f3b5b;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.tab.active { background: #1f3b5b; color: #fff; border-color: #1f3b5b; }
+
+.field { display: flex; flex-direction: column; margin-bottom: 16px; }
+.field label { font-size: 13px; font-weight: 600; color: #1f3b5b; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+}
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f3b5b;
+    cursor: pointer;
+}
+.checkbox-label input {
+    flex: 0 0 auto;
+}
+.terms-label {
+    align-items: flex-start;
+    line-height: 1.4;
+}
+.terms-label label {
+    display: inline;
+    margin: 0;
+}
+.terms-link {
+    background: none;
+    border: none;
+    color: #2c5380;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: 0;
+    text-decoration: underline;
+}
+.terms-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(18, 34, 52, 0.64);
+}
+.terms-dialog {
+    width: min(680px, 100%);
+    max-height: min(760px, 90vh);
+    overflow: auto;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 18px 48px rgba(18, 34, 52, 0.28);
+}
+.terms-dialog header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e3e9f0;
+    background: #fff;
+}
+.terms-dialog h2 {
+    margin: 0;
+    color: #1f3b5b;
+    font-size: 22px;
+}
+.terms-close {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #d0dce8;
+    border-radius: 50%;
+    background: #f7f9fb;
+    color: #1f3b5b;
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+}
+.terms-content {
+    padding: 22px 24px 26px;
+}
+.terms-content h3 {
+    margin: 22px 0 8px;
+    color: #1f3b5b;
+    font-size: 17px;
+}
+.terms-content h3:first-child { margin-top: 0; }
+.terms-content h4 {
+    margin: 14px 0 4px;
+    color: #1f3b5b;
+    font-size: 14.5px;
+}
+.terms-content p,
+.terms-content ul {
+    margin: 0 0 12px;
+    color: #34465a;
+}
+.terms-content ul { padding-left: 22px; }
+.terms-content li { margin-bottom: 6px; }
+
+.btn {
+    background: #1f3b5b;
+    color: white;
+    padding: 13px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    width: 100%;
+    transition: 0.2s;
+}
+.btn:hover { background: #2c5380; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #2c5380;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.message {
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: none;
+}
+.message.show { display: block; }
+.message.error { background: #fdecea; color: #b3261e; border: 1px solid #f5c6c2; }
+.message.success { background: #e7f4ec; color: #1d6b3a; border: 1px solid #b9e0c7; }
+
+.hidden { display: none !important; }
+
+/* Logged-in Dashboard Area */
+.dashboard {
+    display: flex;
+    min-height: 600px;
+    border: 1px solid #e3e9f0;
+    border-top: 4px solid #1f3b5b;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(31,59,91,0.08);
+}
+
+.sidebar {
+    width: 260px;
+    background: #1f3b5b;
+    color: white;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar h3 {
+    margin: 0 0 24px 0;
+    font-size: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 12px;
+}
+.account-info {
+    font-size: 13px;
+    margin-bottom: 20px;
+    color: #b9c8d8;
+    word-break: break-all;
+}
+.account-info strong {
+    color: #fff;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: none;
+    background: #2c5380;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.2s;
+}
+.menu-btn:hover, .menu-btn.active {
+    background: #3b6798;
+}
+.menu-btn.logout {
+    background: #b3261e;
+    margin-top: auto;
+    margin-bottom: 0;
+    text-align: center;
+    width: 80px;
+        margin-left: 20px; /* pushes it right */
+
+}
+.menu-btn.logout:hover {
+    background: #961f18;
+}
+
+.content {
+    flex: 1;
+    padding: 32px;
+    background: white;
+}
+.content h2 {
+    color: #1f3b5b;
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+/* Upload features */
+.dropzone {
+    border: 2px dashed #b9c8d8;
+    border-radius: 10px;
+    padding: 36px 20px;
+    text-align: center;
+    color: #5a6b7d;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #fafcff;
+    margin-top: 12px;
+}
+.dropzone:hover, .dropzone.dragover {
+    border-color: #1f3b5b;
+    background: #f0f5fb;
+    color: #1f3b5b;
+}
+.dropzone .icon { font-size: 34px; display: block; margin-bottom: 8px; }
+.dropzone .pick { color: #1f3b5b; font-weight: 600; text-decoration: underline; }
+.dropzone small { display: block; margin-top: 6px; color: #8a98a8; }
+
+.selected-file {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #f4f7fb;
+    border: 1px solid #dce5ef;
+    border-radius: 8px;
+    font-size: 14px;
+}
+.selected-file.show { display: flex; }
+
+.files { margin-top: 32px; }
+.files h3 { color: #1f3b5b; font-size: 17px; margin-bottom: 14px; }
+.file-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid #e9eef4;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.file-row .meta { min-width: 0; }
+.file-row .name {
+    font-weight: 600;
+    color: #1f3b5b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.file-row .sub { font-size: 12px; color: #8a98a8; }
+.file-row .actions { display: flex; gap: 8px; flex-shrink: 0; }
+.file-row .actions a, .file-row .actions button {
+    font-size: 13px;
+    text-decoration: none;
+    color: #2c5380;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+.file-row .actions button.del { color: #b3261e; }
+
+/* Shared Documents as a dropdown (used when more than two files exist) */
+.file-select-wrap { display: flex; flex-direction: column; gap: 12px; }
+.file-select-wrap select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 15px;
+    width: 100%;
+}
+.file-select-wrap .actions { display: flex; gap: 14px; }
+.file-select-wrap .actions a,
+.file-select-wrap .actions button {
+    font-size: 13px;
+    text-decoration: none;
+    color: #2c5380;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+}
+.file-select-wrap .actions button.del { color: #b3261e; }
+.file-select-wrap .actions button:disabled { color: #8a98a8; cursor: default; }
+
+.empty { color: #8a98a8; font-size: 14px; padding: 8px 0; }
+.report-result {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border: 1px solid #b9e0c7;
+    border-radius: 8px;
+    background: #e7f4ec;
+    color: #1d6b3a;
+    font-size: 14px;
+}
+.report-result.show { display: block; }
+.report-result a { color: #1f3b5b; font-weight: 700; }
+.processing-dots span {
+    animation: blink-dot 1.2s infinite;
+    opacity: 0.2;
+}
+.processing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.processing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink-dot {
+    0%, 20% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Feature Specific Elements */
+.chat-window {
+    border: 1px solid #e3e9f0;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fafcff;
+}
+.chat-messages {
+    height: 320px;
+    overflow-y: auto;
+    border: 1px solid #dce5ef;
+    background: #fff;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    color: #8a98a8;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+}
+.chat-msg {
+    margin-bottom: 10px;
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.chat-msg.user {
+    align-self: flex-end;
+    background: #1f3b5b;
+    color: #fff;
+    border-bottom-right-radius: 2px;
+}
+.chat-msg.assistant {
+    align-self: flex-start;
+    background: #eef2f7;
+    color: #2b2b2b;
+    border-bottom-left-radius: 2px;
+}
+.chat-msg.pending { opacity: 0.6; }
+.chat-window textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: none;
+    font-family: inherit;
+    margin-bottom: 10px;
+}
+.chat-window textarea:disabled { background: #f4f7fb; }
+
+.consultation-form textarea {
+    width: 100%;
+    height: 150px;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+    margin-bottom: 16px;
+}
+
+.footer {
+    background: #1f3b5b;
+    color: white;
+    text-align: center;
+    padding: 30px;
+    margin-top: 60px;
+}
+.footer a { color: #fff; text-decoration: none; }
+
+@media (max-width: 768px) {
+    .header { padding: 16px 20px; }
+    .dashboard { flex-direction: column; }
+    .sidebar { width: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <a href="home.html#home"><img src="logo_final.png" alt="Business Reform Logo" class="main-logo"></a>
+    <div class="nav">
+        <a href="home.html#home">Home</a>
+        <a href="home.html#services">Services</a>
+        <span class="lang-switch">
+            <a href="portal-el.html" class="lang-flag" aria-label="Ελληνικά" title="Ελληνικά">
+                <svg viewBox="0 0 27 18" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <rect width="27" height="18" fill="#0D5EAF"/>
+                    <path d="M0,2H27M0,6H27M0,10H27M0,14H27" stroke="#fff" stroke-width="2"/>
+                    <rect width="10" height="10" fill="#0D5EAF"/>
+                    <path d="M5,0V10M0,5H10" stroke="#fff" stroke-width="2"/>
+                </svg>
+            </a>
+            <a href="portal.html" class="lang-flag lang-active" aria-label="English" title="English">
+                <svg viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">
+                    <defs><clipPath id="uk-clip-portal"><rect width="60" height="40"/></clipPath></defs>
+                    <g clip-path="url(#uk-clip-portal)">
+                        <rect width="60" height="40" fill="#012169"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" stroke-width="8"/>
+                        <path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#fff" stroke-width="14"/>
+                        <path d="M30,0 V40 M0,20 H60" stroke="#C8102E" stroke-width="8"/>
+                    </g>
+                </svg>
+            </a>
+        </span>
+        <button class="menu-btn logout hidden" id="logout-btn">Logout</button>
+    </div>
+</div>
+
+<div class="portal">
+    <div class="portal-intro">
+        <h1>Your personal dashboard</h1>
+        <p>Use your own personal AI CFO helper.<br>
+            Securely access your workspace and share documents with our team.</p>
+    </div>
+
+    <div class="panel" id="auth-panel">
+        <div class="tabs">
+            <div class="tab active" id="tab-login">Log In</div>
+            <div class="tab" id="tab-signup">Sign Up</div>
+        </div>
+
+        <div class="message" id="auth-message"></div>
+
+        <form id="login-form">
+            <div class="field">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" autocomplete="email" required>
+            </div>
+            <div class="field">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" autocomplete="current-password" required>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-login-password"> Show Password
+                </label>
+            </div>
+            <button type="submit" class="btn" id="login-btn">Log In</button>
+            <p style="text-align:center;margin:14px 0 0;">
+                <button type="button" class="link-btn" id="forgot-btn">Forgot your password?</button>
+            </p>
+        </form>
+
+        <form id="signup-form" class="hidden">
+            <div class="field">
+                <label for="signup-name">Full name</label>
+                <input type="text" id="signup-name" autocomplete="name" required>
+            </div>
+            <div class="field">
+                <label for="signup-email">Email</label>
+                <input type="email" id="signup-email" autocomplete="email" required>
+            </div>
+            <div class="field">
+                <label for="signup-password">Password</label>
+                <input type="password" id="signup-password" autocomplete="new-password" minlength="8" required>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="show-signup-password"> Show Password
+                </label>
+                <div class="checkbox-label terms-label">
+                    <input type="checkbox" id="signup-terms" required>
+                    <span><label for="signup-terms">I have read and agreed to the</label> <button type="button" class="terms-link" id="terms-open">Terms and Conditions of Use</button></span>
+                </div>
+            </div>
+            <button type="submit" class="btn" id="signup-btn">Create Account</button>
+        </form>
+    </div>
+
+    <div class="dashboard hidden" id="app-panel">
+        <div class="sidebar">
+            <h3>Client Workspace</h3>
+            <div class="account-info">Signed in as:<br><strong id="user-email"></strong></div>
+            
+            <button class="menu-btn active" id="menu-home">Dashboard</button>
+            <button class="menu-btn" id="menu-reports">Report Generation</button>
+            <button class="menu-btn" id="menu-chat">Chat With Us</button>
+            <button class="menu-btn" id="menu-consultation">Consultation Request</button>
+            <button class="menu-btn" id="menu-billing">Billing & Subscription</button>
+            
+                    </div>
+
+        <div class="content">
+            <div class="message" id="app-message"></div>
+
+            <div id="page-home">
+                <h2>Welcome to Business Reform Portal</h2>
+                <p>Please select an option from the left menu panel to manage your account options, request reports, or communicate with our financial consultants.</p>
+            </div>
+
+            <div id="page-reports" class="hidden">
+                <h2>Report Generation</h2>
+                <p>Select the financial analysis module you want to run against your enterprise files:</p>
+                
+                <div class="field">
+                    <label for="report-type">Select Report Type</label>
+                    <select id="report-type">
+                        <option value="break-even">Break-Even Analysis Report</option>
+                        <option value="financial-projections">5 Year Financial Projections Report with KPIs</option>
+                        <option value="burn-rate">Burn Rate Report</option>
+                        <option value="cash-flow-forecast">13-Week / 12-Month Rolling Cash Flow Forecast Report</option>
+                        <option value="capital-optimization">Capital Optimization & Restructuring Report</option>
+                        <option value="use-of-funds">Use of Funds Report</option>
+                    </select>
+                </div>
+
+                <h3 style="color:#1f3b5b; margin: 24px 0 8px; font-size:15px;">Upload supporting documents</h3>
+                <div class="dropzone" id="dropzone">
+                    <span class="icon">⬆️</span>
+                    <span><span class="pick">Choose a file</span> or drag &amp; drop it here</span>
+                    <small>Up to 25 MB per file</small>
+                </div>
+                <input type="file" id="file-input" class="hidden">
+
+                <div class="selected-file" id="selected-file">
+                    <span id="selected-name"></span>
+                    <span style="display:flex; gap:8px; flex-shrink:0;">
+                        <button class="btn" id="upload-btn" style="width:auto; padding:8px 18px;">Upload</button>
+                        <button type="button" class="link-btn" id="remove-pending-btn" style="color:#b3261e;">Remove</button>
+                    </span>
+                </div>
+
+                <div class="files">
+                    <h3>Your Shared Documents</h3>
+                    <div id="file-list"><div class="empty">Loading…</div></div>
+                </div>
+                <button type="button" class="btn" id="generate-report-btn" style="width: auto; padding: 12px 30px;">Generate report! </button>
+                <div class="report-result" id="report-result"></div>
+            </div>
+
+            <div id="page-chat" class="hidden">
+                <h2>Chat With Us</h2>
+                <p>Have an instantaneous question about your ongoing account optimizations? Message our AI CFO helper below.</p>
+
+                <div class="chat-window">
+                    <div class="chat-messages" id="chat-messages">Loading chat history…</div>
+                    <textarea id="chat-input" placeholder="Type your message here... (Enter to send, Shift+Enter for a new line)"></textarea>
+                    <button type="button" class="btn" id="chat-send-btn" style="width: auto; padding: 10px 24px;">Send Message</button>
+                </div>
+            </div>
+
+            <div id="page-consultation" class="hidden">
+                <h2>Consultation Request</h2>
+                <p>Submit custom requirements directly to company evaluation analysts.</p>
+
+                <div style="margin-bottom: 24px;">
+                    <p style="font-size: 20px; font-weight: 700; color: #1f3b5b; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 2px solid #e3e9f0;">Business Reform</p>
+                </div>
+
+                <form id="consultation-form" class="consultation-form">
+                    <input type="hidden" name="access_key" value="827b5e3f-5f25-496a-ae39-0eded16449c6">
+                    <input type="hidden" name="subject" value="New Consultation Request – Client Portal">
+
+                    <div class="field">
+                        <label for="consultation-name">Full Name</label>
+                        <input type="text" id="consultation-name" name="name" placeholder="Your full name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="consultation-email">Email Address</label>
+                        <input type="email" id="consultation-email" name="email" placeholder="Your email address" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="consultation-company">Company Name</label>
+                        <input type="text" id="consultation-company" name="company" placeholder="Your company name">
+                    </div>
+
+                    <div class="field">
+                        <label for="consultation-text">Describe Request Requirements</label>
+                        <textarea id="consultation-text" name="message" placeholder="Please describe here the financial or/and business analysis report needed & the purpose it is needed for" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" id="consultation-submit-btn" style="width: auto; padding: 12px 30px;">Submit Request </button>
+                </form>
+            </div>
+
+            <div id="page-billing" class="hidden">
+                <h2>Billing & Subscription</h2>
+                <p>Adjust your company alignment schedules or change operational transaction methods.</p>
+                
+                <div class="field">
+                    <label for="billing-duration">Subscription Plan</label>
+                    <select id="billing-duration">
+                        <option value="monthly-individual">Monthly Individual</option>
+                        <option value="annual-individual">Annual Individual</option>
+                        <option value="monthly-business">Monthly Business</option>
+                        <option value="annual-business">Annual Business</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="payment-method">Payment Processing System</label>
+                    <select id="payment-method">
+                        <option value="credit-card">Credit Card</option>
+                        <option value="credit-card-stripe">Credit Card - Stripe</option>
+                        <option value="google-pay">Google Pay</option>
+                        <option value="apple-pay">Apple Pay</option>
+                        <option value="wire-transfer">Wire Transfer</option>
+                    </select>
+                </div>
+                <button type="button" class="btn" style="width: auto; padding: 12px 24px; margin-top:10px;">Update Billing Parameters</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="terms-modal hidden" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <div class="terms-dialog">
+        <header>
+            <h2 id="terms-title">Terms and Conditions of Use</h2>
+            <button type="button" class="terms-close" id="terms-close" aria-label="Close terms and conditions">&times;</button>
+        </header>
+        <div class="terms-content">
+            <p><strong>BUSINESS-REFORM.COM — TERMS OF USE POLICY &amp; DISCLAIMERS</strong></p>
+
+            <h3>PART 1: Definitions &amp; Terms and Conditions</h3>
+
+            <h4>1.1 Definitions</h4>
+            <ul>
+                <li>"Company" refers to Business Reform, a business entity based in Athens, Greece, operating the platform business-reform.com.</li>
+                <li>"Service" refers to the AI CFO platform, including data ingestion, financial transformation tools, KPI dashboards, predictive analytics, and consulting or advisory services delivered via the platform or associated channels.</li>
+                <li>"User" refers to any individual, company, or legal entity that accesses, registers for, uploads data to, or uses the Services.</li>
+                <li>"Platform" refers to the digital infrastructure hosted at business-reform.com and associated systems, APIs, or third-party integrations used to deliver the Services.</li>
+                <li>"Report" refers to any AI-generated or system-generated output, including but not limited to Financial Projections, Burn Rate analysis, Break-Even analysis, KPI dashboards, cash flow forecasts, scenario modeling, and strategic financial insights.</li>
+                <li>"User Data" refers to all files, financial records, documents, ERP exports, spreadsheets, and any other information uploaded or transmitted by the User.</li>
+                <li>"AI Outputs" refers to all machine-generated insights, predictions, summaries, and structured outputs generated from User Data.</li>
+            </ul>
+
+            <h4>1.2 Terms of Use</h4>
+            <p>By accessing or using the Service, the User agrees to be legally bound by these Terms. Business Reform provides AI-powered financial intelligence tools designed to transform raw financial and operational data into structured executive-level insights.</p>
+            <p>To use the Service, Users must complete the platform workflow:</p>
+            <ul>
+                <li>Sign-up / Account creation</li>
+                <li>Selection of Report type</li>
+                <li>Upload of relevant financial or operational data</li>
+                <li>AI processing and generation of outputs</li>
+            </ul>
+            <p>The Company reserves the right to modify, suspend, or discontinue any part of the Service at any time to ensure operational integrity, security, or compliance.</p>
+
+            <h4>1.3 User Responsibilities for Uploads</h4>
+            <p>The User bears full responsibility for all uploaded content. By uploading data, the User represents and warrants that:</p>
+            <ul>
+                <li><strong>Accuracy &amp; Completeness:</strong> All submitted information is accurate, lawful, and complete to the best of the User's knowledge.</li>
+                <li><strong>Lawful Origin of Data:</strong> All financial data, revenue sources, and underlying records originate from lawful business activities and comply with applicable laws and regulations.</li>
+                <li><strong>Rights &amp; Authorization:</strong> The User owns or has lawful rights, licenses, or permissions to upload and process all submitted data.</li>
+                <li><strong>No Infringement:</strong> Uploaded materials do not infringe upon intellectual property rights, confidentiality obligations, trade secrets, or third-party rights.</li>
+                <li><strong>Compliance:</strong> The User will not use the Service for fraudulent reporting, financial misrepresentation, money laundering, tax evasion, or any unlawful activity.</li>
+            </ul>
+            <p>The Company disclaims any responsibility for the legality, accuracy, or integrity of User Data.</p>
+
+            <h3>PART 2: Privacy Policy</h3>
+            <p>Business Reform processes data in accordance with the General Data Protection Regulation (GDPR – EU 2016/679) and applicable Greek data protection laws.</p>
+
+            <h4>2.1 Data Collection</h4>
+            <p>We collect and process:</p>
+            <ul>
+                <li>Account registration data (name, email, organization details)</li>
+                <li>Financial and operational datasets uploaded by Users</li>
+                <li>System usage data (log data, performance metrics, interaction data)</li>
+                <li>Technical metadata required for platform operation</li>
+            </ul>
+
+            <h4>2.2 Purpose of Processing</h4>
+            <p>Data is processed strictly for:</p>
+            <ul>
+                <li>Generation of AI CFO reports and financial insights</li>
+                <li>Transformation of ERP/accounting data into executive dashboards</li>
+                <li>Improvement of AI models, analytics accuracy, and platform performance</li>
+                <li>Ensuring platform security, fraud prevention, and system stability</li>
+                <li>Providing customer support and consulting services</li>
+            </ul>
+            <p>We do not sell personal or financial data.</p>
+
+            <h4>2.3 Legal Basis for Processing</h4>
+            <p>Processing is based on:</p>
+            <ul>
+                <li>Contractual necessity (service delivery)</li>
+                <li>Legitimate interest (platform improvement, security)</li>
+                <li>Legal obligations (where applicable)</li>
+                <li>User consent (where explicitly required)</li>
+            </ul>
+
+            <h4>2.4 Data Security</h4>
+            <p>The Company implements appropriate technical and organizational measures including:</p>
+            <ul>
+                <li>Encryption of data in transit and at rest</li>
+                <li>Access control and authentication mechanisms</li>
+                <li>Segregated processing environments</li>
+                <li>Audit logging and monitoring</li>
+                <li>Principle of least privilege access</li>
+            </ul>
+            <p>While we implement strong safeguards, no system can guarantee absolute security.</p>
+
+            <h4>2.5 Data Retention</h4>
+            <p>Data is retained only as long as necessary to:</p>
+            <ul>
+                <li>Provide Services</li>
+                <li>Comply with legal obligations</li>
+                <li>Resolve disputes or enforce agreements</li>
+            </ul>
+            <p>Users may request deletion subject to legal retention requirements.</p>
+
+            <h3>PART 3: Cookie Policy</h3>
+            <p>The Business Reform platform uses cookies and similar technologies.</p>
+
+            <h4>3.1 Types of Cookies</h4>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Required for authentication, secure login, and core platform functionality.</li>
+                <li><strong>Functional Cookies:</strong> Improve user experience and workflow continuity.</li>
+                <li><strong>Performance &amp; Analytics Cookies:</strong> Help measure system performance, AI processing efficiency, and platform optimization.</li>
+                <li><strong>Security Cookies:</strong> Detect anomalies, prevent abuse, and protect user accounts.</li>
+            </ul>
+
+            <h4>3.2 User Control</h4>
+            <p>Users may manage or disable cookies via browser settings. However, disabling essential cookies may limit or prevent access to core AI CFO functionality.</p>
+
+            <h3>PART 4: Disclaimers</h3>
+
+            <h4>4.1 AI Disclaimer</h4>
+            <p>The Service uses artificial intelligence and statistical models to generate financial insights. All AI-generated outputs:</p>
+            <ul>
+                <li>Are probabilistic and interpretative in nature</li>
+                <li>Do not constitute financial, legal, tax, or investment advice</li>
+                <li>Should not be the sole basis for financial decision-making</li>
+            </ul>
+            <p>Users are encouraged to consult qualified professionals before making business-critical decisions.</p>
+
+            <h4>4.2 Report Disclaimer</h4>
+            <p>Reports are generated exclusively from User-provided data and assumptions. The Company:</p>
+            <ul>
+                <li>Does not guarantee accuracy of underlying User Data</li>
+                <li>Does not guarantee future business performance or outcomes</li>
+                <li>Is not responsible for financial decisions based on projections or forecasts</li>
+                <li>Does not assume liability for losses resulting from reliance on Reports</li>
+            </ul>
+            <p>Forecasts, scenarios, and projections are inherently uncertain.</p>
+
+            <h4>4.3 Upload Consent</h4>
+            <p>By clicking "Upload" or submitting data, the User explicitly:</p>
+            <ul>
+                <li>Authorizes processing of submitted data via AI systems</li>
+                <li>Accepts automated and semi-automated processing methods</li>
+                <li>Consents to transformation of data into structured financial outputs</li>
+            </ul>
+
+            <h4>4.4 Limitation of Liability</h4>
+            <p>To the maximum extent permitted by law:</p>
+            <ul>
+                <li>The Company shall not be liable for indirect, incidental, consequential, or punitive damages</li>
+                <li>Liability for data-driven decisions rests solely with the User</li>
+                <li>Total liability shall not exceed the amount paid (if any) for the Service within the preceding 12 months</li>
+            </ul>
+
+            <h3>PART 5: Data Processing Agreement (DPA)</h3>
+            <p>This Data Processing Agreement governs processing under GDPR.</p>
+
+            <h4>5.1 Roles</h4>
+            <ul>
+                <li>User: Data Controller</li>
+                <li>Business Reform: Data Processor</li>
+            </ul>
+
+            <h4>5.2 Scope of Processing</h4>
+            <p>The Processor shall process personal and financial data solely for:</p>
+            <ul>
+                <li>AI CFO analysis</li>
+                <li>Financial modeling and reporting</li>
+                <li>Dashboard generation</li>
+                <li>System optimization and service delivery</li>
+            </ul>
+            <p>No processing occurs outside the documented scope without explicit instruction.</p>
+
+            <h4>5.3 Confidentiality</h4>
+            <p>All User Data is treated as strictly confidential. Access is limited to authorized personnel and secure systems under confidentiality obligations.</p>
+
+            <h4>5.4 Sub-processors</h4>
+            <p>The Company may engage third-party infrastructure providers or AI model providers to deliver Services. All sub-processors are required to:</p>
+            <ul>
+                <li>Maintain GDPR-compliant safeguards</li>
+                <li>Implement industry-standard security controls</li>
+                <li>Process data only under contractual instructions</li>
+            </ul>
+
+            <h4>5.5 Data Subject Rights</h4>
+            <p>Business Reform assists Users in fulfilling GDPR obligations, including:</p>
+            <ul>
+                <li>Right of access</li>
+                <li>Right to rectification</li>
+                <li>Right to erasure</li>
+                <li>Right to restriction</li>
+                <li>Right to data portability</li>
+                <li>Right to objection</li>
+            </ul>
+            <p>Requests will be addressed within legally required timeframes.</p>
+
+            <h4>5.6 Data Breach Notification</h4>
+            <p>In the event of a personal data breach, the Company will:</p>
+            <ul>
+                <li>Notify relevant authorities where legally required</li>
+                <li>Inform affected Users without undue delay</li>
+                <li>Take remedial action to mitigate risks</li>
+            </ul>
+
+            <h3>PART 6: EU Artificial Intelligence Act Compliance</h3>
+            <p>Business Reform designs and operates the Service in line with Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (the "EU AI Act"), as its obligations become applicable, alongside the GDPR and the other laws referred to in these Terms.</p>
+
+            <h4>6.1 Role of the Company and AI Systems Used</h4>
+            <p>The AI CFO is an AI system operated by Business Reform under its own name. It is built on general-purpose AI models supplied by third-party AI model providers (see Section 5.4), which are subject to their own obligations as providers of general-purpose AI models under Chapter V of the EU AI Act. Business Reform acts as the provider of the AI CFO system as offered to Users and as a deployer of the underlying models.</p>
+
+            <h4>6.2 Risk Classification and Intended Purpose</h4>
+            <p>The intended purpose of the AI CFO is to transform business financial and operational data into financial analysis, reports, KPI dashboards and projections for companies. The Service:</p>
+            <ul>
+                <li>Does not engage in any prohibited AI practice under Article 5 of the EU AI Act</li>
+                <li>Is not intended for any high-risk use listed in Annex III of the EU AI Act, including evaluating the creditworthiness of natural persons or establishing their credit score, risk assessment and pricing for life or health insurance, or decisions on employment, recruitment or access to essential services</li>
+                <li>Is therefore treated as an AI system subject to the transparency obligations of Article 50 of the EU AI Act</li>
+            </ul>
+            <p>Users must not use the Service or its AI Outputs for a high-risk purpose listed in Annex III, or for any purpose prohibited by Article 5. A User who does so acts outside the intended purpose of the Service and assumes the corresponding obligations under the EU AI Act.</p>
+
+            <h4>6.3 Transparency and Marking of AI-Generated Content</h4>
+            <p>In accordance with Article 50 of the EU AI Act:</p>
+            <ul>
+                <li>Users are informed, before and during use, that they are interacting with an AI system, including when using the chat assistant</li>
+                <li>Every Report generated by the Service carries a visible "AI generated" mark with a reference to the EU AI Act: at the bottom left of every slide in PowerPoint presentations, and on the cover sheet and at the bottom left of every printed page in Excel workbooks</li>
+                <li>Generated files also carry a machine-readable statement in their document metadata identifying the content as AI-generated</li>
+            </ul>
+            <p>Users must not remove, conceal or alter the AI-generated marking when sharing Reports with third parties. Where a User publishes AI Outputs to inform the public on matters of public interest, the User is responsible for any disclosure required of it under Article 50(4), unless the content has undergone human review or editorial control and a person holds editorial responsibility for its publication.</p>
+
+            <h4>6.4 Human Oversight</h4>
+            <p>The Service is a decision-support tool. AI Outputs are designed to be reviewed by the User and, where appropriate, by qualified professionals before they are relied upon (see Part 4). No decision producing legal effects on, or similarly significantly affecting, a natural person is taken by the Service solely through automated processing. Users may request review of a Report by a member of the Business Reform team.</p>
+
+            <h4>6.5 Accuracy, Traceability and Record-Keeping</h4>
+            <p>To support accuracy and accountability, the Service:</p>
+            <ul>
+                <li>Computes key figures with deterministic calculations and presents them as live Excel formulas linked to the underlying data, so they can be checked</li>
+                <li>States the data caveats, excluded items, classification rationale and limitations of each Report in a dedicated assumptions section</li>
+                <li>Keeps records of each Report request and its outputs, for the period set out in Section 2.5</li>
+            </ul>
+            <p>These measures reduce but do not eliminate the risk of errors. The disclaimers in Part 4 continue to apply.</p>
+
+            <h4>6.6 AI Literacy</h4>
+            <p>In line with Article 4 of the EU AI Act, Business Reform takes measures to ensure that its staff and anyone operating the Service on its behalf have a sufficient level of AI literacy, taking into account their technical knowledge, experience and the context in which the Service is used.</p>
+
+            <h4>6.7 Reporting Concerns and Updates</h4>
+            <p>Users may report incorrect, misleading or otherwise problematic AI Outputs, or any concern about the Service's compliance with the EU AI Act, through the contact details on the Platform. The Company will review such reports and take corrective action where necessary. Users also retain the right to lodge a complaint with the competent national market surveillance authority.</p>
+            <p>The Company will update this Part as further provisions of the EU AI Act become applicable and as guidelines, implementing acts and codes of practice are published by the European Commission and the AI Office.</p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© 2026 Business Reform | All Rights Reserved</p>
+</div>
+
+<script type="module">
+import {
+    login, signup, logout, getUser,
+    requestPasswordRecovery, handleAuthCallback,
+    AuthError, MissingIdentityError,
+} from 'https://esm.sh/@netlify/identity@1.2.0';
+
+// --- Element Refs ---
+const authPanel = document.getElementById('auth-panel');
+const appPanel = document.getElementById('app-panel');
+const authMessage = document.getElementById('auth-message');
+const appMessage = document.getElementById('app-message');
+const userEmail = document.getElementById('user-email');
+
+const tabLogin = document.getElementById('tab-login');
+const tabSignup = document.getElementById('tab-signup');
+const loginForm = document.getElementById('login-form');
+const signupForm = document.getElementById('signup-form');
+const signupTerms = document.getElementById('signup-terms');
+const termsOpen = document.getElementById('terms-open');
+const termsClose = document.getElementById('terms-close');
+const termsModal = document.getElementById('terms-modal');
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+const selectedFile = document.getElementById('selected-file');
+const selectedName = document.getElementById('selected-name');
+const uploadBtn = document.getElementById('upload-btn');
+const removePendingBtn = document.getElementById('remove-pending-btn');
+const fileList = document.getElementById('file-list');
+const logoutBtn = document.getElementById('logout-btn');
+const reportType = document.getElementById('report-type');
+const generateReportBtn = document.getElementById('generate-report-btn');
+const reportResult = document.getElementById('report-result');
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
+
+// --- Navigation Pages Hookups ---
+const menuHome = document.getElementById('menu-home');
+const menuReports = document.getElementById('menu-reports');
+const menuChat = document.getElementById('menu-chat');
+const menuConsultation = document.getElementById('menu-consultation');
+const menuBilling = document.getElementById('menu-billing');
+
+const pageHome = document.getElementById('page-home');
+const pageReports = document.getElementById('page-reports');
+const pageChat = document.getElementById('page-chat');
+const pageConsultation = document.getElementById('page-consultation');
+const pageBilling = document.getElementById('page-billing');
+
+const menuButtons = [menuHome, menuReports, menuChat, menuConsultation, menuBilling];
+const pages = [pageHome, pageReports, pageChat, pageConsultation, pageBilling];
+
+let pendingFile = null;
+let selectedReportFileKey = null;
+let selectedReportFileName = '';
+let reportPollTimer = null;
+let currentFiles = [];
+let chatHistoryLoaded = false;
+
+// Netlify Blobs list() is eventually consistent and can lag up to ~60s behind a
+// write, so a fresh upload/delete may not show up in the next /api/portal/files
+// response. These overlays keep the UI correct in the meantime and clear
+// themselves once the server list catches up.
+let serverFiles = [];
+const pendingAdds = new Map();     // key -> optimistic file, until list() includes it
+const pendingDeletes = new Set();  // key, until list() stops returning it
+let fileResyncTimers = [];
+
+// --- Helper Switch Functional Layout Views ---
+function switchView(activeMenu, activePage) {
+    menuButtons.forEach(btn => btn.classList.remove('active'));
+    pages.forEach(p => p.classList.add('hidden'));
+    
+    activeMenu.classList.add('active');
+    activePage.classList.remove('hidden');
+    clearMessage(appMessage);
+}
+
+menuHome.addEventListener('click', () => switchView(menuHome, pageHome));
+menuReports.addEventListener('click', () => switchView(menuReports, pageReports));
+menuChat.addEventListener('click', () => {
+    switchView(menuChat, pageChat);
+    if (!chatHistoryLoaded) loadChatHistory();
+});
+menuConsultation.addEventListener('click', () => switchView(menuConsultation, pageConsultation));
+menuBilling.addEventListener('click', () => switchView(menuBilling, pageBilling));
+
+// --- Password Visibility Features ---
+document.getElementById('show-login-password').addEventListener('change', function() {
+    document.getElementById('login-password').type = this.checked ? 'text' : 'password';
+});
+
+document.getElementById('show-signup-password').addEventListener('change', function() {
+    document.getElementById('signup-password').type = this.checked ? 'text' : 'password';
+});
+
+function openTermsModal() {
+    termsModal.classList.remove('hidden');
+    termsClose.focus();
+}
+
+function closeTermsModal() {
+    termsModal.classList.add('hidden');
+    termsOpen.focus();
+}
+
+termsOpen.addEventListener('click', openTermsModal);
+termsClose.addEventListener('click', closeTermsModal);
+termsModal.addEventListener('click', (event) => {
+    if (event.target === termsModal) closeTermsModal();
+});
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !termsModal.classList.contains('hidden')) {
+        closeTermsModal();
+    }
+});
+
+
+
+// --- Auth Messages Systems ---
+function showMessage(el, text, kind) {
+    el.textContent = text;
+    el.className = `message show ${kind}`;
+}
+function clearMessage(el) { el.className = 'message'; el.textContent = ''; }
+
+function formatSize(bytes) {
+    if (!bytes) return '';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let i = 0, n = bytes;
+    while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+    return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+function describeError(error) {
+    // Always log full error for debugging (remove in production)
+    console.error('Auth error object:', error);
+
+    // Handle MissingIdentityError specifically
+    if (error instanceof MissingIdentityError) {
+        return 'The client portal is not active yet. Please try again shortly or contact us.';
+    }
+
+    // If library exposes AuthError class, inspect it
+    if (error instanceof AuthError || error && typeof error === 'object') {
+        // Try to read common fields that may contain server text
+        const raw = error.error_description || error.error || error.message || (error.json && error.json.error_description) || '';
+
+        // Look for confirmation-specific messages (narrow match)
+        if (/confirm(ed|ation)?|user is not confirmed|email not verified|email not confirmed/i.test(raw)) {
+            return 'Your email address has not been verified yet. Please check your inbox and click the activation link.';
+        }
+
+        // invalid_grant can mean bad credentials — do not assume it's always email verification
+        if (/invalid_grant/i.test(raw)) {
+            return 'Invalid email or password. If you think this is wrong, check your password or reset it.';
+        }
+
+        // Common HTTP statuses
+        switch (error.status) {
+            case 401: return raw || 'Invalid email or password.';
+            case 403: return 'Sign ups are currently disabled. Please contact us for access.';
+            case 422: return 'Please check your details — the password may be too weak.';
+            case 404: return 'No account found for that email.';
+            default:
+                return raw || (typeof error === 'string' ? error : 'Something went wrong. Please try again.');
+        }
+    }
+
+    // Fallback
+    return 'Something went wrong. Please try again.';
+}
+
+// --- View State Switches ---
+function showLoggedIn(user, showConfirmationMessage = false) {
+    userEmail.textContent = user.email;
+    authPanel.classList.add('hidden');
+    appPanel.classList.remove('hidden');
+     logoutBtn.classList.remove('hidden'); // SHOW LOGOUT
+    switchView(menuHome, pageHome);
+    if (showConfirmationMessage) {
+        showMessage(appMessage, 'Email confirmed successfully. Welcome!', 'success');
+    }
+    loadFiles();
+}
+function showLoggedOut() {
+    appPanel.classList.add('hidden');
+    authPanel.classList.remove('hidden');
+    logoutBtn.classList.add('hidden'); // HIDE LOGOUT
+    tabLogin.click();
+}
+
+// --- Auth Tab Toggling ---
+tabLogin.addEventListener('click', () => {
+    tabLogin.classList.add('active');
+    tabSignup.classList.remove('active');
+    loginForm.classList.remove('hidden');
+    signupForm.classList.add('hidden');
+    clearMessage(authMessage);
+});
+tabSignup.addEventListener('click', () => {
+    tabSignup.classList.add('active');
+    tabLogin.classList.remove('active');
+    signupForm.classList.remove('hidden');
+    loginForm.classList.add('hidden');
+    clearMessage(authMessage);
+});
+
+// --- Execution Login Form Handlers ---
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true; clearMessage(authMessage);
+    try {
+        const user = await login(
+            document.getElementById('login-email').value,
+            document.getElementById('login-password').value,
+        );
+        showLoggedIn(user);
+    } catch (error) {
+        console.error('Login error (debug):', error);
+        showMessage(authMessage, describeError(error), 'error');
+    } finally {
+        btn.disabled = false;
+    }
+});
+
+// --- Signup Form Handlers (client-side validation + clearer loading state) ---
+signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('signup-btn');
+
+    // Prevent double submission
+    if (btn.disabled) return;
+
+    clearMessage(authMessage);
+
+    // Client-side validation
+    const nameEl = document.getElementById('signup-name');
+    const emailEl = document.getElementById('signup-email');
+    const passEl = document.getElementById('signup-password');
+
+    const name = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    const password = passEl.value || '';
+
+    if (!name) {
+        showMessage(authMessage, 'Please enter your full name.', 'error');
+        nameEl.focus();
+        return;
+    }
+    if (!emailEl.checkValidity()) {
+        showMessage(authMessage, 'Please enter a valid email address.', 'error');
+        emailEl.focus();
+        return;
+    }
+    if (password.length < 8) {
+        showMessage(authMessage, 'Password must be at least 8 characters.', 'error');
+        passEl.focus();
+        return;
+    }
+    if (!signupTerms.checked) {
+        showMessage(authMessage, 'Please read and agree to the Terms and Conditions of Use.', 'error');
+        signupTerms.focus();
+        return;
+    }
+
+    // Clear previous messages and show loading state
+    clearMessage(authMessage);
+    btn.disabled = true;
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'Creating…';
+    btn.setAttribute('aria-busy', 'true');
+
+    try {
+        const user = await signup(
+            email,
+            password,
+            { full_name: name },
+        );
+
+        // @netlify/identity returns a User whose `confirmedAt` is set only when
+        // the account is already confirmed (i.e. Autoconfirm is ON).
+        if (user && user.confirmedAt) {
+            // Autoconfirm is ON — the user is created and already logged in.
+            showLoggedIn(user);
+        } else {
+            // Autoconfirm is OFF — a confirmation email was sent and the user is
+            // NOT logged in yet. They must click the activation link first.
+            tabLogin.click();
+            showMessage(authMessage, 'Account created! Check your email for the confirmation link to activate your account, then log in here.', 'success');
+        }
+    } catch (error) {
+        // Keep a debug log for troubleshooting
+        console.error('Signup error (debug):', error);
+        showMessage(authMessage, describeError(error), 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = btn.dataset.originalText || 'Create Account';
+        btn.removeAttribute('aria-busy');
+    }
+});
+
+// --- Forgot Passwords Operations ---
+document.getElementById('forgot-btn').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value;
+    if (!email) {
+        showMessage(authMessage, 'Enter your email above first, then click again.', 'error');
+        return;
+    }
+    try {
+        await requestPasswordRecovery(email);
+        showMessage(authMessage, 'Check your email for a password reset link.', 'success');
+    } catch (error) {
+        showMessage(authMessage, describeError(error), 'error');
+    }
+});
+
+// --- Logout Events ---
+document.getElementById('logout-btn').addEventListener('click', async () => {
+    await logout();
+    showLoggedOut();
+});
+
+// --- File Selection Architecture ---
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) setPendingFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) setPendingFile(fileInput.files[0]);
+});
+
+function setPendingFile(file) {
+    pendingFile = file;
+    selectedName.textContent = `${file.name} (${formatSize(file.size)})`;
+    selectedFile.classList.add('show');
+    clearMessage(appMessage);
+    reportResult.classList.remove('show');
+    reportResult.textContent = '';
+}
+
+function clearPendingFile() {
+    pendingFile = null;
+    fileInput.value = '';
+    selectedFile.classList.remove('show');
+    selectedName.textContent = '';
+}
+
+removePendingBtn.addEventListener('click', clearPendingFile);
+
+// --- Upload Pipeline ---
+uploadBtn.addEventListener('click', async () => {
+    if (!pendingFile) return;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Uploading…';
+    clearMessage(appMessage);
+    try {
+        const body = new FormData();
+        body.append('file', pendingFile);
+        const res = await fetch('/api/portal/upload', { method: 'POST', body, credentials: 'include' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Upload failed.');
+        const uploadedFile = data.file || {
+            key: data.key,
+            name: data.name || pendingFile.name,
+            size: data.size || pendingFile.size,
+            uploadedAt: new Date().toISOString(),
+        };
+        selectedReportFileKey = uploadedFile.key;
+        selectedReportFileName = uploadedFile.name;
+        showMessage(appMessage, `"${pendingFile.name}" uploaded successfully.`, 'success');
+        pendingFile = null;
+        fileInput.value = '';
+        selectedFile.classList.remove('show');
+        pendingAdds.set(uploadedFile.key, uploadedFile);
+        pendingDeletes.delete(uploadedFile.key);
+        renderFiles(reconcileFiles());
+        loadFiles();
+        scheduleFileResync();
+    } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+    } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload';
+    }
+});
+
+// --- File Storage Listing Loading ---
+async function loadFiles() {
+    const optimistic = pendingAdds.size || pendingDeletes.size;
+    if (!optimistic && !serverFiles.length) fileList.innerHTML = '<div class="empty">Loading…</div>';
+    try {
+        const res = await fetch('/api/portal/files', { credentials: 'include' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Could not load files.');
+        serverFiles = data.files || [];
+        renderFiles(reconcileFiles());
+    } catch (error) {
+        if (serverFiles.length || pendingAdds.size) {
+            renderFiles(reconcileFiles());
+            return;
+        }
+        fileList.innerHTML = `<div class="empty">${error.message}</div>`;
+    }
+}
+
+// Fold the optimistic add/delete overlays into the last server list. Any overlay
+// entry that the server has caught up on is dropped, so the overlays converge to
+// empty on their own.
+function reconcileFiles() {
+    const byKey = new Map();
+    for (const f of serverFiles) byKey.set(f.key, f);
+    for (const [key, file] of pendingAdds) {
+        if (byKey.has(key)) pendingAdds.delete(key);
+        else byKey.set(key, file);
+    }
+    for (const key of [...pendingDeletes]) {
+        if (byKey.has(key)) byKey.delete(key);
+        else pendingDeletes.delete(key);
+    }
+    const files = [...byKey.values()];
+    files.sort((a, b) => String(b.uploadedAt || '').localeCompare(String(a.uploadedAt || '')));
+    return files;
+}
+
+// list() can lag a write by up to a minute; re-pull a few times so the overlay
+// clears without the user having to refresh.
+function scheduleFileResync() {
+    fileResyncTimers.forEach((t) => clearTimeout(t));
+    fileResyncTimers = [4000, 12000, 30000].map((ms) => window.setTimeout(loadFiles, ms));
+}
+
+function selectFileForReport(f, files) {
+    selectedReportFileKey = f.key;
+    selectedReportFileName = f.name;
+    showMessage(appMessage, `"${f.name}" selected for report generation.`, 'success');
+    reportResult.classList.remove('show');
+    reportResult.textContent = '';
+    renderFiles(files);
+}
+
+function fileSubText(f) {
+    const when = f.uploadedAt ? new Date(f.uploadedAt).toLocaleString() : '';
+    return [formatSize(f.size), when].filter(Boolean).join(' · ');
+}
+
+// More than two shared documents: collapse the list into a dropdown, with a
+// single row of actions operating on the currently selected file.
+function renderFilesDropdown(files) {
+    const wrap = document.createElement('div');
+    wrap.className = 'file-select-wrap';
+
+    const select = document.createElement('select');
+    select.id = 'file-select';
+    for (const f of files) {
+        const opt = document.createElement('option');
+        opt.value = f.key;
+        opt.textContent = [f.name, fileSubText(f)].filter(Boolean).join('  —  ');
+        select.append(opt);
+    }
+    if (selectedReportFileKey && files.some((f) => f.key === selectedReportFileKey)) {
+        select.value = selectedReportFileKey;
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+    const use = document.createElement('button');
+    const dl = document.createElement('a');
+    dl.textContent = 'Download';
+    const del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = 'Delete';
+    actions.append(use, dl, del);
+
+    const currentFile = () => files.find((f) => f.key === select.value) || files[0];
+    const syncActions = () => {
+        const f = currentFile();
+        const isSelected = f.key === selectedReportFileKey;
+        use.textContent = isSelected ? 'Selected' : 'Use for report';
+        use.disabled = isSelected;
+        dl.href = `/api/portal/files?key=${encodeURIComponent(f.key)}`;
+    };
+    syncActions();
+
+    select.addEventListener('change', syncActions);
+    use.addEventListener('click', () => selectFileForReport(currentFile(), files));
+    del.addEventListener('click', () => {
+        const f = currentFile();
+        deleteFile(f.key, f.name);
+    });
+
+    wrap.append(select, actions);
+    fileList.append(wrap);
+}
+
+function renderFiles(files) {
+    currentFiles = files;
+    if (!files.length) {
+        fileList.innerHTML = '<div class="empty">No files yet. Upload your first document above.</div>';
+        return;
+    }
+    fileList.innerHTML = '';
+
+    if (files.length > 2) {
+        renderFilesDropdown(files);
+        return;
+    }
+
+    for (const f of files) {
+        const row = document.createElement('div');
+        row.className = 'file-row';
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const name = document.createElement('div');
+        name.textContent = f.name;
+        const sub = document.createElement('div');
+        sub.className = 'sub';
+        sub.textContent = fileSubText(f);
+        meta.append(name, sub);
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        const use = document.createElement('button');
+        use.textContent = f.key === selectedReportFileKey ? 'Selected' : 'Use for report';
+        use.disabled = f.key === selectedReportFileKey;
+        use.addEventListener('click', () => selectFileForReport(f, files));
+        const dl = document.createElement('a');
+        dl.href = `/api/portal/files?key=${encodeURIComponent(f.key)}`;
+        dl.textContent = 'Download';
+        const del = document.createElement('button');
+        del.className = 'del';
+        del.textContent = 'Delete';
+        del.addEventListener('click', () => deleteFile(f.key, f.name));
+        actions.append(use, dl, del);
+
+        row.append(meta, actions);
+        fileList.append(row);
+    }
+}
+
+async function deleteFile(key, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try {
+        const res = await fetch(`/api/portal/files?key=${encodeURIComponent(key)}`, {
+            method: 'DELETE', credentials: 'include',
+        });
+        if (!res.ok) throw new Error('Could not delete the file.');
+        pendingDeletes.add(key);
+        pendingAdds.delete(key);
+        if (selectedReportFileKey === key) {
+            selectedReportFileKey = null;
+            selectedReportFileName = '';
+        }
+        showMessage(appMessage, `"${name}" was removed from your shared documents.`, 'success');
+        renderFiles(reconcileFiles());
+        loadFiles();
+        scheduleFileResync();
+    } catch (error) {
+        showMessage(appMessage, error.message, 'error');
+    }
+}
+
+function setGenerateProcessing(isProcessing) {
+    generateReportBtn.disabled = isProcessing;
+    if (isProcessing) {
+        generateReportBtn.innerHTML = 'Processing<span class="processing-dots"><span>.</span><span>.</span><span>.</span></span>';
+        generateReportBtn.setAttribute('aria-busy', 'true');
+    } else {
+        generateReportBtn.textContent = 'Generate report!';
+        generateReportBtn.removeAttribute('aria-busy');
+    }
+}
+
+async function startReportGeneration() {
+    if (!selectedReportFileKey) {
+        showMessage(appMessage, 'Upload a file or choose one from your shared documents first.', 'error');
+        return;
+    }
+
+    clearMessage(appMessage);
+    reportResult.classList.remove('show');
+    reportResult.textContent = '';
+    setGenerateProcessing(true);
+
+    try {
+        const res = await fetch('/api/portal/generate-report', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fileKey: selectedReportFileKey,
+                reportType: reportType.value,
+            }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Could not start report generation.');
+        pollReportJob(data.jobId);
+    } catch (error) {
+        setGenerateProcessing(false);
+        showMessage(appMessage, error.message, 'error');
+    }
+}
+
+async function pollReportJob(jobId) {
+    window.clearTimeout(reportPollTimer);
+    try {
+        const res = await fetch(`/api/portal/generate-report?jobId=${encodeURIComponent(jobId)}`, {
+            credentials: 'include',
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Could not check report status.');
+
+        if (data.status === 'complete') {
+            setGenerateProcessing(false);
+            reportResult.textContent = `${data.downloadFileName || `${data.reportLabel}.xlsx`} is ready. `;
+            const downloadLink = document.createElement('a');
+            downloadLink.href = data.downloadUrl;
+            downloadLink.textContent = 'Download Excel report';
+            downloadLink.setAttribute('download', data.downloadFileName || `${data.reportLabel}.xlsx`);
+            reportResult.append(downloadLink);
+            if (data.downloadUrlPptx) {
+                reportResult.append(document.createTextNode('  '));
+                const pptxLink = document.createElement('a');
+                pptxLink.href = data.downloadUrlPptx;
+                pptxLink.textContent = 'Download PowerPoint presentation';
+                pptxLink.setAttribute('download', data.downloadFileNamePptx || `${data.reportLabel}.pptx`);
+                reportResult.append(pptxLink);
+            }
+            reportResult.classList.add('show');
+            showMessage(appMessage, 'Report generated successfully.', 'success');
+            return;
+        }
+
+        if (data.status === 'failed') {
+            throw new Error(data.error || 'Report generation failed. Please try again.');
+        }
+
+        reportPollTimer = window.setTimeout(() => pollReportJob(jobId), 2500);
+    } catch (error) {
+        setGenerateProcessing(false);
+        showMessage(appMessage, error.message, 'error');
+    }
+}
+
+generateReportBtn.addEventListener('click', startReportGeneration);
+
+// --- Chat With Us ---
+function renderChatMessages(messages) {
+    chatMessages.innerHTML = '';
+    if (!messages.length) {
+        chatMessages.innerHTML = '<div class="empty">No previous chat history. Ask your first question below.</div>';
+        return;
+    }
+    for (const msg of messages) {
+        const bubble = document.createElement('div');
+        bubble.className = `chat-msg ${msg.role === 'user' ? 'user' : 'assistant'}`;
+        bubble.textContent = msg.content;
+        chatMessages.append(bubble);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function loadChatHistory() {
+    chatHistoryLoaded = true;
+    try {
+        const res = await fetch('/api/portal/chat', { credentials: 'include' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Could not load chat history.');
+        renderChatMessages(data.messages || []);
+    } catch (error) {
+        chatMessages.innerHTML = `<div class="empty">${error.message}</div>`;
+    }
+}
+
+async function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    chatSendBtn.disabled = true;
+    chatInput.disabled = true;
+
+    const pendingBubble = document.createElement('div');
+    pendingBubble.className = 'chat-msg user';
+    pendingBubble.textContent = text;
+    if (chatMessages.querySelector('.empty')) chatMessages.innerHTML = '';
+    chatMessages.append(pendingBubble);
+
+    const thinkingBubble = document.createElement('div');
+    thinkingBubble.className = 'chat-msg assistant pending';
+    thinkingBubble.textContent = 'Thinking…';
+    chatMessages.append(thinkingBubble);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    chatInput.value = '';
+
+    try {
+        const res = await fetch('/api/portal/chat', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Could not get a response right now. Please try again.');
+        renderChatMessages(data.messages || []);
+    } catch (error) {
+        thinkingBubble.classList.remove('pending');
+        thinkingBubble.textContent = error.message;
+    } finally {
+        chatSendBtn.disabled = false;
+        chatInput.disabled = false;
+        chatInput.focus();
+    }
+}
+
+chatSendBtn.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+    }
+});
+
+// --- Consultation Form – Web3Forms Submission ---
+document.getElementById('consultation-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('consultation-submit-btn');
+    btn.disabled = true;
+    const previousText = btn.textContent;
+    btn.textContent = 'Sending…';
+    clearMessage(appMessage);
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (result.success) {
+            showMessage(appMessage, 'Request submitted successfully. Our team will contact you soon.', 'success');
+            this.reset();
+        } else {
+            showMessage(appMessage, result.message || result.error || 'Submission failed. Please try again.', 'error');
+        }
+    } catch (err) {
+        showMessage(appMessage, 'Submission failed. Please try again later.', 'error');
+        console.error('Consultation submission error', err);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = previousText || 'Submit Request ';
+    }
+});
+
+// --- Process Netlify Identity confirmation callback (activation links) and init user state ---
+(async function processAuthCallbackAndInit() {
+    // When a user clicks the activation/confirmation link in their email, they
+    // land back here with a token in the URL hash (e.g. #confirmation_token=...).
+    // handleAuthCallback() reads that hash, confirms the email, logs the user in,
+    // and returns { type, user }. It returns null on a normal page load.
+    try {
+        const result = await handleAuthCallback();
+        if (result) {
+            if (result.type === 'confirmation') {
+                // Email confirmed — the user is now authenticated. Send them
+                // straight into their dashboard with a success message.
+                showLoggedIn(result.user, true);
+                return;
+            }
+            if (result.type === 'recovery') {
+                // Password recovery link — the user is authenticated and can now
+                // sign in / update their password from the login section.
+                tabLogin.click();
+                showMessage(authMessage, 'Email verified. You can now log in.', 'success');
+                return;
+            }
+            if (result.user) {
+                // Any other callback that yields a session (oauth, email_change).
+                showLoggedIn(result.user);
+                return;
+            }
+        }
+    } catch (err) {
+        // Token missing, expired, or already used.
+        console.error('Auth callback error:', err);
+        tabLogin.click();
+        showMessage(authMessage, 'This confirmation link is invalid or has already been used. Please log in below.', 'error');
+        return;
+    }
+
+    // Normal page load: restore an existing session if one is present.
+    try {
+        const current = await getUser().catch(() => null);
+        if (current) {
+            showLoggedIn(current);
+        }
+    } catch (err) {
+        // No active session — stay on the login/signup view.
+    }
+})();
+</script>
+</body>
+</html>
