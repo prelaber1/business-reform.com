@@ -7,6 +7,7 @@ import type { ValidationIssue } from './FinancialValidationService.mts'
 
 // Everything the review needs, all of it already verified upstream.
 export type NarrativeContext = {
+  reportType?: string
   reportLabel: string
   issues?: ValidationIssue[]
   growth?: GrowthAssumptions
@@ -167,6 +168,76 @@ export function reviewToSections(review: NarrativeReview): ReportSection[] {
   return sections
 }
 
+// ---- FP&A digest narrative ----
+// The digest replaces the CFO review: it is a short, review-ready update
+// written from the computed variances (weekly-fpa-digest rubric), so the prose
+// is generated after the calculation rather than from the raw extraction.
+
+const DIGEST_TOOL: Anthropic.Tool = {
+  name: 'submit_digest',
+  description: 'Submit the FP&A digest. Cite only figures that appear in the computed metrics provided.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      headline: { type: 'string', description: 'One or two sentences: what the period looks like against trend and last year' },
+      whatMoved: { type: 'array', items: { type: 'string' }, description: 'The metrics that moved most, largest first, each with current value, change vs trailing average and vs last year, and the reported driver if the source gives one' },
+      watchItems: { type: 'array', items: { type: 'string' }, description: 'Up to 3 items to watch next period' },
+      questions: { type: 'array', items: { type: 'string' }, description: 'Up to 3 questions the reviewer should confirm before sending, e.g. unexplained moves or thin history' },
+    },
+    required: ['headline', 'whatMoved', 'watchItems', 'questions'],
+  },
+}
+
+const DIGEST_SYSTEM_PROMPT = `You write a recurring FP&A update that a finance lead will review before it is shared. Compare the current period against trailing history and against the same period a year ago, using only the computed metrics provided. Lead with the headline. Then give the metrics that moved, largest first, each with its figure and both comparisons. Say whether a move is good or bad for the business (a cost rising is unfavourable, revenue rising is favourable). Separate what the source explains from what it does not: never invent a driver for a move; flag an unexplained flagged metric as a question for the reviewer. If trailing history or prior-year data is missing or thin, say so rather than comparing. Be brief and scannable. Quote figures exactly as given and do not recompute them. Plain text only, no markdown. Professional English.`
+
+export function digestToSections(input: unknown): { headline: string; sections: ReportSection[] } | null {
+  const raw = (input ?? {}) as Record<string, unknown>
+  if (typeof raw.headline !== 'string' || !raw.headline.trim()) return null
+  const sections: ReportSection[] = []
+  const moved = asStrings(raw.whatMoved)
+  const watch = asStrings(raw.watchItems)
+  const questions = asStrings(raw.questions)
+  if (moved.length) sections.push({ heading: 'What Moved', bullets: moved })
+  if (watch.length) sections.push({ heading: 'Watch Next Period', bullets: watch })
+  if (questions.length) sections.push({ heading: 'Questions for the Reviewer', bullets: questions })
+  return { headline: raw.headline.trim(), sections }
+}
+
+async function buildDigestNarrative(base: ReportData, extracted: ExtractedDocument, model: ReportModelBase | null, context: NarrativeContext): Promise<ReportData> {
+  try {
+    const anthropic = new Anthropic()
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-5-5',
+      max_tokens: 2500,
+      system: DIGEST_SYSTEM_PROMPT,
+      tools: [DIGEST_TOOL],
+      tool_choice: { type: 'tool', name: 'submit_digest' },
+      messages: [{
+        role: 'user',
+        content: [
+          `Report type: ${context.reportLabel}`,
+          describeModel(model),
+          extracted.narrative.sections.length
+            ? `Management commentary quoted from the source:\n${extracted.narrative.sections.map((s) => `${s.heading}: ${s.body ?? ''} ${(s.bullets ?? []).join('; ')}`).join('\n')}`
+            : 'The source contains no management commentary on drivers.',
+          'Call submit_digest.',
+        ].join('\n\n'),
+      }],
+    })
+    const toolUse = message.content.find((p): p is Anthropic.ToolUseBlock => p.type === 'tool_use' && p.name === 'submit_digest')
+    const digest = toolUse ? digestToSections(toolUse.input) : null
+    if (!digest) {
+      console.warn('Digest narrative returned no usable result; report generated with the extraction prose.')
+      return base
+    }
+    // Source commentary stays after the digest sections as supporting detail.
+    return { ...base, executiveSummary: digest.headline, sections: [...digest.sections, ...base.sections] }
+  } catch (error) {
+    console.error('Digest narrative failed; report generated with the extraction prose.', error)
+    return base
+  }
+}
+
 const describeModel = (model: ReportModelBase | null) =>
   model
     ? [
@@ -199,6 +270,8 @@ export async function buildReportNarrative(
       dataCaveats: [...base.assumptions.dataCaveats, ...dataQuality.map((i) => `Data check: ${i.message}`)],
     }
   }
+
+  if (context.reportType === 'fpa-digest') return buildDigestNarrative(base, extracted, model, context)
 
   try {
     const anthropic = new Anthropic()
