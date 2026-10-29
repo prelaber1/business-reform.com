@@ -19,6 +19,7 @@ const REQUIRED_GROUPS: Record<string, string[]> = {
   'capital-optimization': ['equity'],
   'financial-projections': ['revenue'],
   'budget-vs-actual': ['actual_revenue', 'actual_cost', 'budget_revenue', 'budget_cost'],
+  'fpa-digest': ['current_period', 'trailing_period', 'prior_year_period'],
 }
 
 const isValidLineItem = (li: unknown): li is LineItem => {
@@ -142,6 +143,18 @@ export function runModelSanityChecks(reportType: string, lineItems: LineItem[]):
       else if (Number(match[2]) > (/week/i.test(match[1]) ? 13 : 12) || Number(match[2]) < 1) warn(`Period "${li.period}" on "${li.label}" is outside the forecast horizon.`)
     }
     if (flows.length > 0 && !flows.some((li) => li.group === 'cash_outflow')) warn('No cash outflows were extracted; burn and runway cannot be meaningful.')
+  }
+
+  if (reportType === 'fpa-digest') {
+    const current = new Set(lineItems.filter((li) => li.group === 'current_period').map((li) => li.label.trim().toLowerCase()))
+    for (const group of ['trailing_period', 'prior_year_period']) {
+      const orphans = [...new Set(lineItems.filter((li) => li.group === group).map((li) => li.label.trim().toLowerCase()))].filter((l) => !current.has(l))
+      if (orphans.length) warn(`${group} has metrics with no matching current_period metric (labels must match exactly): ${orphans.join(', ')}.`)
+    }
+    const trailing = lineItems.filter((li) => li.group === 'trailing_period')
+    if (trailing.length && trailing.some((li) => !li.period)) warn('Some trailing_period items have no period label; the number of periods averaged cannot be verified.')
+    const priorYear = lineItems.filter((li) => li.group === 'prior_year_period')
+    if (new Set(priorYear.map((li) => li.label.trim().toLowerCase())).size < priorYear.length) warn('prior_year_period has more than one figure for the same metric; they will be summed.')
   }
 
   // Cross-item consistency: sign conventions and units.

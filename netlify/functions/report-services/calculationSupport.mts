@@ -158,4 +158,7 @@ export const PLATFORM_ASSUMPTIONS = {
   // Applied in the Cash Flow Forecast calculator to convert a run-rate from
   // one granularity to the other when the source data only supports one.
   weeksPerMonth: 4.33, // 52 weeks / 12 months
+  // Applied in the FP&A Digest calculator: a metric whose current period moved
+  // this much (as a fraction) against trailing average or last year is flagged.
+  digestFlagThreshold: 0.1,
 }
