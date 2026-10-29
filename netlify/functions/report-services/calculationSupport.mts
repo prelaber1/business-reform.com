@@ -132,6 +132,9 @@ export type ReportModelBase = {
   keyMetrics: KeyMetric[]
   charts: ReportChart[]
   extraCaveats: string[]
+  // Computed facts a calculator wants the narrative pass to explain (e.g. the
+  // material variances), so the AI comments on figures instead of deriving them.
+  narrativeFacts?: string[]
   // Escape hatch for calculators whose output doesn't fit the generic
   // account-list (RawDataSheetModel) / label-value (CalcSheetModel) shapes —
   // e.g. a multi-year, multi-column projection grid. Each builder is invoked

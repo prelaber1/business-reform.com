@@ -4,6 +4,7 @@ import type { LineItem, ReportData, ReportSection } from './types.mts'
 import type { ReportModelBase } from './calculationSupport.mts'
 import type { GrowthAssumptions } from './GrowthAssumptionService.mts'
 import type { ValidationIssue } from './FinancialValidationService.mts'
+import { buildVarianceCommentary } from './VarianceCommentaryService.mts'
 
 // Everything the review needs, all of it already verified upstream.
 export type NarrativeContext = {
@@ -172,6 +173,7 @@ const describeModel = (model: ReportModelBase | null) =>
     ? [
         'Computed key metrics:',
         ...model.keyMetrics.map((m) => `- ${m.label}: ${m.value}`),
+        ...(model.narrativeFacts ?? []).map((f) => `Fact: ${f}`),
         ...model.extraCaveats.map((c) => `Caveat: ${c}`),
       ].join('\n')
     : 'No computed model for this report type.'
@@ -191,6 +193,12 @@ export async function buildReportNarrative(
     assumptions: extracted.assumptions,
   }
   if (!context) return base
+
+  // Variance reports lead with driver commentary, ahead of the generic CFO review.
+  if (model?.narrativeFacts?.length) {
+    const commentary = await buildVarianceCommentary(extracted, model.narrativeFacts)
+    base.sections = [...commentary, ...base.sections]
+  }
 
   const dataQuality = (context.issues ?? []).filter((i) => i.severity === 'warning')
   if (dataQuality.length) {

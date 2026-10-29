@@ -80,4 +80,16 @@ Classify every relevant line item into "lineItems" using one of these group tags
 
 Classify every funding allocation category into "lineItems" using the group tag "allocation_category", with "label" as the category name and "amount" as the € allocated to it. Do NOT calculate each category's percentage of total funding yourself — the analysis engine computes this deterministically from your classified figures. Qualitative content (justification per category, ROI narrative, disbursement schedule, risk factors, governance controls) belongs in "sections" as prose/bullets, not "lineItems".`,
   },
+  'budget-vs-actual': {
+    label: 'Budget vs Actual Variance Report',
+    instructions: `Produce a Budget vs Actual Variance Report. Include:
+- Headline variance for revenue, costs and operating result (budget, actual, variance, variance %)
+- A line-by-line variance table with favorable/unfavorable status
+- Flagging of material variances and the likely drivers behind each, using only explanations found in the source (volume, price/rate, timing, one-off, mix, FX); if the source gives no explanation, say the driver is not documented rather than guessing
+- A bar chart of the largest variances
+- Open questions for budget owners on unexplained material variances
+- Executive summary with the key messages for leadership and recommended actions
+
+Classify every relevant line item into "lineItems" using one of these group tags: "budget_revenue", "actual_revenue", "budget_cost", "actual_cost" (the amount for the same period on both sides, costs as positive amounts), and optionally "budget_units" / "actual_units" (volume or quantity for a revenue or cost line, only when the source gives it). Use the identical "label" for a budget line and its matching actual line (and units line) so the engine can pair them; use the same level of detail on both sides and never net a line against another. If the source covers several periods, use the period the user most plausibly wants (the latest closed period) and say so in assumptions.classificationRationale. Do NOT calculate variances, percentages, totals or volume/price effects yourself — the analysis engine computes these deterministically from your classified figures. Explain any non-obvious classification or pairing choices in assumptions.classificationRationale.`,
+  },
 }
