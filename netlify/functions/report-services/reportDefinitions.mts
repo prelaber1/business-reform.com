@@ -80,4 +80,15 @@ Classify every relevant line item into "lineItems" using one of these group tags
 
 Classify every funding allocation category into "lineItems" using the group tag "allocation_category", with "label" as the category name and "amount" as the € allocated to it. Do NOT calculate each category's percentage of total funding yourself — the analysis engine computes this deterministically from your classified figures. Qualitative content (justification per category, ROI narrative, disbursement schedule, risk factors, governance controls) belongs in "sections" as prose/bullets, not "lineItems".`,
   },
+  'fpa-digest': {
+    label: 'FP&A Digest',
+    instructions: `Produce a concise FP&A Digest: a review-ready update comparing the current period's numbers against the trailing history and against the same period a year ago. Include:
+- The headline: what the period looks like in one or two sentences
+- The key metrics with their change versus the trailing average and versus the same period last year
+- Which metrics moved enough to need an explanation, and the drivers management gives in the source
+- Items to watch next period
+- Open questions the reviewer should confirm before this goes out
+
+Classify every metric figure into "lineItems" using one of these group tags: "current_period" (the period being reported), "trailing_period" (each earlier period in the recent history, one item per metric per period, with "period" set to a label such as "Period -1", "Period -2", most recent first), or "prior_year_period" (the same period one year ago). Use the SAME "label" for the same metric in every group (for example "Revenue", "Gross Profit", "Operating Expenses", "Net Income", "Cash Balance", "Headcount") so that periods can be compared; include only the handful of metrics that matter most, at most 12. Enter costs as positive amounts. Do NOT calculate averages, variances, percentage changes or flags yourself and do not compare periods in prose: the analysis engine computes these deterministically from your classified figures and writes the digest narrative from its results. Use "sections" only for management commentary or stated reasons for movements that appear in the source, quoted as reported. If the source lacks trailing history or a prior-year figure, omit it and note the limitation in assumptions.limitations.`,
+  },
 }

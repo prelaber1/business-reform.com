@@ -47,7 +47,7 @@ export async function processReport(job: ReportJob) {
 
     const growth = job.reportType === 'financial-projections' ? await researchGrowthAssumptions(extracted, filename) : undefined
     const model = calculateReportModel(job.reportType, validation.lineItems, growth)
-    const reportData = await buildReportNarrative(extracted, validation.lineItems, model, { reportLabel: reportDef.label, issues: validation.issues, growth })
+    const reportData = await buildReportNarrative(extracted, validation.lineItems, model, { reportType: job.reportType, reportLabel: reportDef.label, issues: validation.issues, growth })
     const files = await generateReportFiles(reportData, model, reportDef.label, filename)
 
     const downloadKey = `${job.userId}/${job.id}.xlsx`
