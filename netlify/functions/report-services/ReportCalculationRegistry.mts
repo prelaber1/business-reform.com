@@ -6,6 +6,7 @@ import { calculateUseOfFunds } from './UseOfFundsCalculationService.mts'
 import { calculateBurnRate } from './BurnRateCalculationService.mts'
 import { calculateCashFlowForecast } from './CashFlowProjectionService.mts'
 import { calculateCapitalOptimization } from './CapitalOptimizationCalculationService.mts'
+import { calculateBudgetVariance } from './BudgetVarianceCalculationService.mts'
 import { calculateFpaDigest } from './FpaDigestCalculationService.mts'
 import { calculateFinancialProjections } from './FinancialProjectionsCalculationService.mts'
 
@@ -26,6 +27,8 @@ export function calculateReportModel(reportType: string, lineItems: LineItem[], 
       return calculateCapitalOptimization(lineItems)
     case 'financial-projections':
       return calculateFinancialProjections(lineItems, growth)
+    case 'budget-vs-actual':
+      return calculateBudgetVariance(lineItems)
     case 'fpa-digest':
       return calculateFpaDigest(lineItems)
     default:

@@ -18,6 +18,7 @@ const REQUIRED_GROUPS: Record<string, string[]> = {
   'cash-flow-forecast': ['starting_cash_balance'],
   'capital-optimization': ['equity'],
   'financial-projections': ['revenue'],
+  'budget-vs-actual': ['actual_revenue', 'actual_cost', 'budget_revenue', 'budget_cost'],
   'fpa-digest': ['current_period', 'trailing_period', 'prior_year_period'],
 }
 
