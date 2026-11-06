@@ -1,6 +1,6 @@
 // Server-side check that a user has an active Stripe subscription.
 // Uses the Stripe REST API directly (no SDK) with a restricted key stored in
-// the STRIPE_SECRET_KEY Netlify environment variable (read-only: Customers, Subscriptions).
+// the BR_STRIPE_SECRET_KEY Netlify environment variable (read-only: Customers, Subscriptions).
 
 const STRIPE_API = 'https://api.stripe.com/v1'
 const CACHE_TTL_MS = 60_000
@@ -23,9 +23,9 @@ async function stripeGet(path: string, params: Record<string, string>, key: stri
 }
 
 export async function hasActiveSubscription(email: string): Promise<boolean> {
-  const key = process.env.STRIPE_SECRET_KEY
+  const key = process.env.BR_STRIPE_SECRET_KEY
   if (!key) {
-    console.error('STRIPE_SECRET_KEY is not configured')
+    console.error('BR_STRIPE_SECRET_KEY is not configured')
     throw new SubscriptionCheckError('Subscription check is not configured.')
   }
 
