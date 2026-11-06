@@ -76,6 +76,8 @@ export type SubscriptionDebug = {
   customers: number
   subscriptionStatuses: string[]
   checkoutSessions: number
+  searchedEmail: string
+  fallback: { subscriptionsScanned: number; sessionsScanned: number; matched: number } | null
   lookupErrors: string[]
 }
 
@@ -92,6 +94,8 @@ export async function hasActiveSubscription(email: string): Promise<{ active: bo
     customers: 0,
     subscriptionStatuses: [],
     checkoutSessions: 0,
+    searchedEmail: email.trim(),
+    fallback: null,
     lookupErrors: [],
   }
 
@@ -151,6 +155,38 @@ export async function hasActiveSubscription(email: string): Promise<{ active: bo
     } catch {
       debug.lookupErrors.push('subscription:error')
     }
+  }
+  // Last-resort fallback (bounded to the 100 most recent): match the email
+  // case-insensitively against recent subscriptions' customers and recent
+  // checkout sessions, in case Stripe's own email filters missed it.
+  if (statuses.size === 0) {
+    const fb = { subscriptionsScanned: 0, sessionsScanned: 0, matched: 0 }
+    debug.fallback = fb
+    const [subsR, sessR] = await Promise.allSettled([
+      stripeGet('/subscriptions', { status: 'all', limit: '100', 'expand[]': 'data.customer' }, key, info),
+      stripeGet('/checkout/sessions', { limit: '100' }, key, info),
+    ])
+    if (subsR.status === 'fulfilled') {
+      fb.subscriptionsScanned = subsR.value.data.length
+      for (const sub of subsR.value.data) {
+        const e = typeof sub.customer === 'object' && sub.customer ? sub.customer.email : undefined
+        if (typeof e === 'string' && e.trim().toLowerCase() === normalized) { statuses.add(sub.status); fb.matched++ }
+      }
+    } else note('fallback_subscriptions', subsR)
+    if (sessR.status === 'fulfilled') {
+      fb.sessionsScanned = sessR.value.data.length
+      for (const sess of sessR.value.data) {
+        const e = sess.customer_details?.email ?? sess.customer_email
+        if (sess.mode !== 'subscription' || typeof e !== 'string' || e.trim().toLowerCase() !== normalized) continue
+        fb.matched++
+        if (typeof sess.subscription === 'string') {
+          try {
+            const res = await fetch(`${STRIPE_API}/subscriptions/${encodeURIComponent(sess.subscription)}`, { headers: { Authorization: `Bearer ${key}` } })
+            if (res.ok) statuses.add(((await res.json()) as { status: string }).status)
+          } catch { /* ignore */ }
+        }
+      }
+    } else note('fallback_sessions', sessR)
   }
   debug.subscriptionStatuses = [...statuses]
 
