@@ -8,26 +8,51 @@ const ACTIVE_STATUSES = new Set(['active', 'trialing'])
 
 const cache = new Map<string, { active: boolean; expires: number }>()
 
+export type KeyInfo = { defined: boolean; length: number; prefix: string; hadWhitespaceOrQuotes: boolean }
+
 export class SubscriptionCheckError extends Error {
-  constructor(message: string, public reason = 'unknown') {
+  constructor(message: string, public reason = 'unknown', public keyInfo?: KeyInfo, public stripeCode?: string) {
     super(message)
   }
 }
 
-async function stripeGet(path: string, params: Record<string, string>, key: string) {
+// Reads the key from the environment, tolerating pasted whitespace, newlines,
+// surrounding quotes or a leading "Bearer ". Returns only non-secret metadata
+// alongside it (never the key itself).
+function readKey(): { key: string; info: KeyInfo } {
+  const nodeEnv = (globalThis as any).process?.env?.BR_STRIPE_SECRET_KEY as string | undefined
+  const netlifyEnv = (globalThis as any).Netlify?.env?.get?.('BR_STRIPE_SECRET_KEY') as string | undefined
+  const raw = nodeEnv ?? netlifyEnv ?? ''
+  const key = raw.trim().replace(/^bearer\s+/i, '').replace(/^["']+|["']+$/g, '').trim()
+  const m = key.match(/^(rk_live|rk_test|sk_live|sk_test|pk_live|pk_test)_/)
+  return {
+    key,
+    info: {
+      defined: raw.length > 0,
+      length: key.length,
+      prefix: m ? m[1] : key ? 'unexpected' : 'none',
+      hadWhitespaceOrQuotes: key !== raw,
+    },
+  }
+}
+
+async function stripeGet(path: string, params: Record<string, string>, key: string, info?: KeyInfo) {
   const res = await fetch(`${STRIPE_API}${path}?${new URLSearchParams(params)}`, {
     headers: { Authorization: `Bearer ${key}` },
   })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    console.error('Stripe API error', { path, status: res.status, body: text.slice(0, 300) })
-    throw new SubscriptionCheckError('Subscription check failed.', `stripe_${res.status}`)
+    let stripeCode: string | undefined
+    try { stripeCode = JSON.parse(text)?.error?.code || JSON.parse(text)?.error?.type } catch { /* not JSON */ }
+    console.error('Stripe API error', { path, status: res.status, stripeCode, keyInfo: info })
+    throw new SubscriptionCheckError('Subscription check failed.', `stripe_${res.status}`, info, stripeCode)
   }
   return (await res.json()) as { data: Array<Record<string, any>> }
 }
 
 export type SubscriptionDebug = {
   mode: 'live' | 'test' | 'unknown'
+  keyInfo: KeyInfo
   customers: number
   subscriptionStatuses: string[]
   checkoutSessions: number
@@ -35,14 +60,15 @@ export type SubscriptionDebug = {
 }
 
 export async function hasActiveSubscription(email: string): Promise<{ active: boolean; debug: SubscriptionDebug }> {
-  const key = process.env.BR_STRIPE_SECRET_KEY
+  const { key, info } = readKey()
   if (!key) {
-    console.error('BR_STRIPE_SECRET_KEY is not configured')
-    throw new SubscriptionCheckError('Subscription check is not configured.', 'missing_key')
+    console.error('BR_STRIPE_SECRET_KEY is not configured', { keyInfo: info })
+    throw new SubscriptionCheckError('Subscription check is not configured.', 'missing_key', info)
   }
 
   const debug: SubscriptionDebug = {
-    mode: key.startsWith('rk_live_') || key.startsWith('sk_live_') ? 'live' : key.startsWith('rk_test_') || key.startsWith('sk_test_') ? 'test' : 'unknown',
+    mode: info.prefix.endsWith('_live') ? 'live' : info.prefix.endsWith('_test') ? 'test' : 'unknown',
+    keyInfo: info,
     customers: 0,
     subscriptionStatuses: [],
     checkoutSessions: 0,
@@ -64,9 +90,9 @@ export async function hasActiveSubscription(email: string): Promise<{ active: bo
   const emails = [...new Set([normalized, trimmed])]
   const q = normalized.replace(/["\\]/g, '')
   const results = await Promise.allSettled([
-    ...emails.map((e) => stripeGet('/customers', { email: e, limit: '10' }, key)),
-    stripeGet('/customers/search', { query: `email:"${q}"`, limit: '10' }, key),
-    ...emails.map((e) => stripeGet('/checkout/sessions', { 'customer_details[email]': e, limit: '20' }, key)),
+    ...emails.map((e) => stripeGet('/customers', { email: e, limit: '10' }, key, info)),
+    stripeGet('/customers/search', { query: `email:"${q}"`, limit: '10' }, key, info),
+    ...emails.map((e) => stripeGet('/checkout/sessions', { 'customer_details[email]': e, limit: '20' }, key, info)),
   ])
   const labels = [...emails.map(() => 'customers'), 'customer_search', ...emails.map(() => 'checkout_sessions')]
   if (results.every((r) => r.status === 'rejected')) throw (results[0] as PromiseRejectedResult).reason
@@ -91,7 +117,7 @@ export async function hasActiveSubscription(email: string): Promise<{ active: bo
   const statuses = new Set<string>()
   for (const customerId of customerIds) {
     try {
-      const subs = await stripeGet('/subscriptions', { customer: customerId, status: 'all', limit: '20' }, key)
+      const subs = await stripeGet('/subscriptions', { customer: customerId, status: 'all', limit: '20' }, key, info)
       for (const sub of subs.data) statuses.add(sub.status)
     } catch (error) {
       debug.lookupErrors.push(`subscriptions:${error instanceof SubscriptionCheckError ? error.reason : 'error'}`)
