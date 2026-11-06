@@ -1613,6 +1613,11 @@ async function startReportGeneration() {
             }),
         });
         const data = await res.json().catch(() => ({}));
+        if (res.status === 402 && data.code === 'subscription_required') {
+            setGenerateProcessing(false);
+            window.alert('Please subscribe to our services on the Pricing page to be able to generate the report you want.');
+            return;
+        }
         if (!res.ok) throw new Error(data.error || 'Could not start report generation.');
         pollReportJob(data.jobId);
     } catch (error) {
