@@ -252,6 +252,11 @@ body::before {
 .message.success { background: #e7f4ec; color: #1d6b3a; border: 1px solid #b9e0c7; }
 
 .hidden { display: none !important; }
+.sub-dialog { width: min(460px, 100%); padding: 28px 26px 24px; border-radius: 12px; background: #fff; box-shadow: 0 18px 48px rgba(18, 34, 52, 0.28); text-align: center; }
+.sub-dialog h2 { margin: 0 0 12px; color: #1f3b5b; font-size: 22px; }
+.sub-dialog p { margin: 0 0 20px; color: #33475b; line-height: 1.5; }
+.sub-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.sub-actions .btn { width: auto; padding: 10px 24px; text-decoration: none; }
 
 /* Logged-in Dashboard Area */
 .dashboard {
@@ -764,6 +769,17 @@ body::before {
     </div>
 </div>
 
+<div class="terms-modal hidden" id="subscription-modal" role="dialog" aria-modal="true" aria-labelledby="subscription-title">
+    <div class="sub-dialog">
+        <h2 id="subscription-title">Απαιτείται συνδρομή</h2>
+        <p id="subscription-message">Παρακαλούμε εγγραφείτε στις υπηρεσίες μας στην σελίδα Pricing για να μπορείτε να παράξετε το report που θέλετε</p>
+        <div class="sub-actions">
+            <a class="btn" href="pricing-el.html">Δείτε τα Πακέτα</a>
+            <button type="button" class="btn" id="subscription-close">Κλείσιμο</button>
+        </div>
+    </div>
+</div>
+
 <div class="terms-modal hidden" id="terms-modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
     <div class="terms-dialog">
         <header>
@@ -1033,6 +1049,9 @@ const signupTerms = document.getElementById('signup-terms');
 const termsOpen = document.getElementById('terms-open');
 const termsClose = document.getElementById('terms-close');
 const termsModal = document.getElementById('terms-modal');
+const subscriptionModal = document.getElementById('subscription-modal');
+document.getElementById('subscription-close').addEventListener('click', () => subscriptionModal.classList.add('hidden'));
+subscriptionModal.addEventListener('click', (e) => { if (e.target === subscriptionModal) subscriptionModal.classList.add('hidden'); });
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('file-input');
@@ -1613,9 +1632,9 @@ async function startReportGeneration() {
             }),
         });
         const data = await res.json().catch(() => ({}));
-        if (res.status === 402 && data.code === 'subscription_required') {
+        if ((res.status === 402 && data.code === 'subscription_required') || (res.status === 503 && data.code === 'subscription_check_failed')) {
             setGenerateProcessing(false);
-            window.alert('Παρακαλούμε εγγραφείτε στις υπηρεσίες μας στην σελίδα Pricing για να μπορείτε να παράξετε το report που θέλετε');
+            subscriptionModal.classList.remove('hidden');
             return;
         }
         if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατή η έναρξη δημιουργίας αναφοράς.');
