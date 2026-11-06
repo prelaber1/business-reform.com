@@ -1613,6 +1613,11 @@ async function startReportGeneration() {
             }),
         });
         const data = await res.json().catch(() => ({}));
+        if (res.status === 402 && data.code === 'subscription_required') {
+            setGenerateProcessing(false);
+            window.alert('Παρακαλούμε εγγραφείτε στις υπηρεσίες μας στην σελίδα Pricing για να μπορείτε να παράξετε το report που θέλετε');
+            return;
+        }
         if (!res.ok) throw new Error(data.error || 'Δεν ήταν δυνατή η έναρξη δημιουργίας αναφοράς.');
         pollReportJob(data.jobId);
     } catch (error) {

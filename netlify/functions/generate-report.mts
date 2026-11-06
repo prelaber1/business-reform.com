@@ -5,6 +5,7 @@ import { REPORTS_STORE, UPLOADS_STORE } from './report-services/constants.mts'
 import { REPORT_DEFINITIONS } from './report-services/reportDefinitions.mts'
 import { getJob, saveJob } from './report-services/ReportOrchestrationService.mts'
 import type { ReportJob } from './report-services/types.mts'
+import { hasActiveSubscription, SubscriptionCheckError } from './report-services/SubscriptionService.mts'
 
 // HTTP entry point. The report pipeline itself lives in ./report-services; the
 // background worker (report-worker-background.mts) runs it via processReport.
@@ -54,7 +55,8 @@ async function startBackgroundReportWorker(req: Request, job: ReportJob) {
   }
 }
 
-const ALLOWED_REPORT_EMAILS = new Set([
+// Admin override: these accounts can generate reports without a Stripe subscription.
+const ADMIN_OVERRIDE_EMAILS = new Set([
   'a.romosios@gmail.com',
   'a_romosios@yahoo.gr',
 'anna.eftychidou@gmail.com',
@@ -65,8 +67,19 @@ const ALLOWED_REPORT_EMAILS = new Set([
 ])
 
 async function handlePost(req: Request, _context: Context, userId: string, userEmail: string | undefined) {
-  if (!userEmail || !ALLOWED_REPORT_EMAILS.has(userEmail.toLowerCase())) {
-    return json({ error: 'Not authorized user request. Please contact site administrators' }, 403)
+  if (!userEmail) return json({ error: 'Your account has no email address.' }, 403)
+
+  if (!ADMIN_OVERRIDE_EMAILS.has(userEmail.toLowerCase())) {
+    try {
+      if (!(await hasActiveSubscription(userEmail))) {
+        return json({ error: 'Subscription required.', code: 'subscription_required' }, 402)
+      }
+    } catch (error) {
+      if (error instanceof SubscriptionCheckError) {
+        return json({ error: 'We could not verify your subscription right now. Please try again shortly.' }, 503)
+      }
+      throw error
+    }
   }
 
   let body: { fileKey?: string; reportType?: string }
