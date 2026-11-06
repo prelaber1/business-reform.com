@@ -71,8 +71,10 @@ async function handlePost(req: Request, _context: Context, userId: string, userE
 
   if (!ADMIN_OVERRIDE_EMAILS.has(userEmail.toLowerCase())) {
     try {
-      if (!(await hasActiveSubscription(userEmail))) {
-        return json({ error: 'Subscription required.', code: 'subscription_required' }, 402)
+      const check = await hasActiveSubscription(userEmail)
+      if (!check.active) {
+        console.log('No active subscription', { debug: check.debug })
+        return json({ error: 'Subscription required.', code: 'subscription_required', debug: check.debug }, 402)
       }
     } catch (error) {
       if (error instanceof SubscriptionCheckError) {

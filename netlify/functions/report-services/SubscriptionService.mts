@@ -26,44 +26,90 @@ async function stripeGet(path: string, params: Record<string, string>, key: stri
   return (await res.json()) as { data: Array<Record<string, any>> }
 }
 
-export async function hasActiveSubscription(email: string): Promise<boolean> {
+export type SubscriptionDebug = {
+  mode: 'live' | 'test' | 'unknown'
+  customers: number
+  subscriptionStatuses: string[]
+  checkoutSessions: number
+  lookupErrors: string[]
+}
+
+export async function hasActiveSubscription(email: string): Promise<{ active: boolean; debug: SubscriptionDebug }> {
   const key = process.env.BR_STRIPE_SECRET_KEY
   if (!key) {
     console.error('BR_STRIPE_SECRET_KEY is not configured')
     throw new SubscriptionCheckError('Subscription check is not configured.', 'missing_key')
   }
 
-  const normalized = email.trim().toLowerCase()
+  const debug: SubscriptionDebug = {
+    mode: key.startsWith('rk_live_') || key.startsWith('sk_live_') ? 'live' : key.startsWith('rk_test_') || key.startsWith('sk_test_') ? 'test' : 'unknown',
+    customers: 0,
+    subscriptionStatuses: [],
+    checkoutSessions: 0,
+    lookupErrors: [],
+  }
+
+  const trimmed = email.trim()
+  const normalized = trimmed.toLowerCase()
   const cached = cache.get(normalized)
-  if (cached && cached.expires > Date.now()) return cached.active
+  if (cached && cached.expires > Date.now()) return { active: cached.active, debug }
 
-  // Stripe email filters are case-sensitive, so try the address as typed in
-  // Stripe-friendly forms: lowercase, plus a case-insensitive search.
-  const customerIds = new Set<string>()
-  // The exact-email list is required; the case-insensitive search is best
-  // effort (a failure there must not block a customer found by the list).
-  const [listed, searched] = await Promise.allSettled([
-    stripeGet('/customers', { email: normalized, limit: '10' }, key),
-    stripeGet('/customers/search', { query: `email:"${normalized.replace(/["\\]/g, '')}"`, limit: '10' }, key),
+  const note = (label: string, r: PromiseRejectedResult) => {
+    debug.lookupErrors.push(`${label}:${r.reason instanceof SubscriptionCheckError ? r.reason.reason : 'error'}`)
+  }
+
+  // Stripe email filters are case-sensitive: try lowercase and as-typed, plus
+  // a search, and checkout sessions (covers customers whose email differs in case
+  // or checkouts where the customer record has no email).
+  const emails = [...new Set([normalized, trimmed])]
+  const q = normalized.replace(/["\\]/g, '')
+  const results = await Promise.allSettled([
+    ...emails.map((e) => stripeGet('/customers', { email: e, limit: '10' }, key)),
+    stripeGet('/customers/search', { query: `email:"${q}"`, limit: '10' }, key),
+    ...emails.map((e) => stripeGet('/checkout/sessions', { 'customer_details[email]': e, limit: '20' }, key)),
   ])
-  if (listed.status === 'rejected' && searched.status === 'rejected') throw listed.reason
-  for (const result of [listed, searched]) {
-    if (result.status !== 'fulfilled') continue
-    for (const c of result.value.data) {
-      if (typeof c.email === 'string' && c.email.toLowerCase() === normalized) customerIds.add(c.id)
-    }
-  }
+  const labels = [...emails.map(() => 'customers'), 'customer_search', ...emails.map(() => 'checkout_sessions')]
+  if (results.every((r) => r.status === 'rejected')) throw (results[0] as PromiseRejectedResult).reason
 
-  let active = false
+  const customerIds = new Set<string>()
+  const subscriptionIds = new Set<string>()
+  results.forEach((r, i) => {
+    if (r.status === 'rejected') return note(labels[i], r)
+    for (const item of r.value.data) {
+      if (labels[i] === 'checkout_sessions') {
+        if (item.mode !== 'subscription') continue
+        debug.checkoutSessions++
+        if (typeof item.customer === 'string') customerIds.add(item.customer)
+        if (typeof item.subscription === 'string') subscriptionIds.add(item.subscription)
+      } else if (typeof item.email === 'string' && item.email.toLowerCase() === normalized) {
+        customerIds.add(item.id)
+      }
+    }
+  })
+  debug.customers = customerIds.size
+
+  const statuses = new Set<string>()
   for (const customerId of customerIds) {
-    const subs = await stripeGet('/subscriptions', { customer: customerId, status: 'all', limit: '20' }, key)
-    if (subs.data.some((s) => ACTIVE_STATUSES.has(s.status))) {
-      active = true
-      break
+    try {
+      const subs = await stripeGet('/subscriptions', { customer: customerId, status: 'all', limit: '20' }, key)
+      for (const sub of subs.data) statuses.add(sub.status)
+    } catch (error) {
+      debug.lookupErrors.push(`subscriptions:${error instanceof SubscriptionCheckError ? error.reason : 'error'}`)
     }
   }
+  for (const subId of subscriptionIds) {
+    try {
+      const res = await fetch(`${STRIPE_API}/subscriptions/${encodeURIComponent(subId)}`, { headers: { Authorization: `Bearer ${key}` } })
+      if (res.ok) statuses.add(((await res.json()) as { status: string }).status)
+      else debug.lookupErrors.push(`subscription:stripe_${res.status}`)
+    } catch {
+      debug.lookupErrors.push('subscription:error')
+    }
+  }
+  debug.subscriptionStatuses = [...statuses]
 
+  const active = debug.subscriptionStatuses.some((st) => ACTIVE_STATUSES.has(st))
   // Only cache positive results so a new purchase unlocks immediately.
   if (active) cache.set(normalized, { active, expires: Date.now() + CACHE_TTL_MS })
-  return active
+  return { active, debug }
 }
