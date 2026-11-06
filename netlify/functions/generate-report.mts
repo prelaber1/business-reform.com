@@ -79,7 +79,7 @@ async function handlePost(req: Request, _context: Context, userId: string, userE
     } catch (error) {
       if (error instanceof SubscriptionCheckError) {
         console.error('Subscription check failed', { reason: error.reason })
-        return json({ error: 'Subscription check failed.', code: 'subscription_check_failed', reason: error.reason }, 503)
+        return json({ error: 'Subscription check failed.', code: 'subscription_check_failed', reason: error.reason, stripeCode: error.stripeCode, keyInfo: error.keyInfo }, 503)
       }
       throw error
     }
