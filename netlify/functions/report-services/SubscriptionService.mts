@@ -8,7 +8,17 @@ const ACTIVE_STATUSES = new Set(['active', 'trialing'])
 
 const cache = new Map<string, { active: boolean; expires: number }>()
 
-export type KeyInfo = { defined: boolean; length: number; prefix: string; hadWhitespaceOrQuotes: boolean }
+export type KeyInfo = {
+  defined: boolean
+  length: number
+  prefix: string
+  hadWhitespaceOrQuotes: boolean
+  // Names only, never values: env vars visible to this function that look relevant.
+  visibleEnvNames?: string[]
+  totalEnvVars?: number
+  netlifyEnvAvailable?: boolean
+  runtime?: string
+}
 
 export class SubscriptionCheckError extends Error {
   constructor(message: string, public reason = 'unknown', public keyInfo?: KeyInfo, public stripeCode?: string) {
@@ -25,9 +35,19 @@ function readKey(): { key: string; info: KeyInfo } {
   const raw = nodeEnv ?? netlifyEnv ?? ''
   const key = raw.trim().replace(/^bearer\s+/i, '').replace(/^["']+|["']+$/g, '').trim()
   const m = key.match(/^(rk_live|rk_test|sk_live|sk_test|pk_live|pk_test)_/)
+  const g = globalThis as any
+  const names = new Set<string>([...Object.keys(g.process?.env ?? {})])
+  let netlifyNames: string[] = []
+  try { netlifyNames = Object.keys(g.Netlify?.env?.toObject?.() ?? {}) } catch { /* ignore */ }
+  netlifyNames.forEach((n) => names.add(n))
+  const relevant = [...names].filter((n) => /stripe/i.test(n) || n.startsWith('BR_')).sort()
   return {
     key,
     info: {
+      visibleEnvNames: relevant,
+      totalEnvVars: names.size,
+      netlifyEnvAvailable: Boolean(g.Netlify?.env),
+      runtime: g.Netlify ? 'netlify-functions-v2' : 'other',
       defined: raw.length > 0,
       length: key.length,
       prefix: m ? m[1] : key ? 'unexpected' : 'none',
