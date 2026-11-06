@@ -73,8 +73,8 @@ async function handlePost(req: Request, _context: Context, userId: string, userE
     try {
       const check = await hasActiveSubscription(userEmail)
       if (!check.active) {
-        console.log('No active subscription', { debug: check.debug })
-        return json({ error: 'Subscription required.', code: 'subscription_required', debug: check.debug }, 402)
+        console.log('No active subscription', { debug: { ...check.debug, emailSource: 'netlify-identity-session' } })
+        return json({ error: 'Subscription required.', code: 'subscription_required', debug: { ...check.debug, emailSource: 'netlify-identity-session' } }, 402)
       }
     } catch (error) {
       if (error instanceof SubscriptionCheckError) {
