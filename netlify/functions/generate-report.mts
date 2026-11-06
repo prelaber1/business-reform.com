@@ -76,7 +76,8 @@ async function handlePost(req: Request, _context: Context, userId: string, userE
       }
     } catch (error) {
       if (error instanceof SubscriptionCheckError) {
-        return json({ error: 'We could not verify your subscription right now. Please try again shortly.' }, 503)
+        console.error('Subscription check failed', { reason: error.reason })
+        return json({ error: 'Subscription check failed.', code: 'subscription_check_failed', reason: error.reason }, 503)
       }
       throw error
     }
